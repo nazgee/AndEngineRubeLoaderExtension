@@ -1,4 +1,4 @@
-package org.iforce2d;
+package org.andengine.extension.rubeloader;
 
 /*
  Author: Chris Campbell - www.iforce2d.net
@@ -51,7 +51,7 @@ import org.json.*;
  * 
  * 
  */
-public class Jb2dJson {
+public class Loader {
 
 	public class Jb2dJsonCustomProperties {
 
@@ -99,11 +99,11 @@ public class Jb2dJson {
 	protected Set<Jb2dJsonImage> m_imagesWithCustomProperties;
 	protected Set<World> m_worldsWithCustomProperties;
 
-	public Jb2dJson() {
+	public Loader() {
 		this(true);
 	}
 
-	public Jb2dJson(boolean useHumanReadableFloats) {
+	public Loader(boolean useHumanReadableFloats) {
 
 		if (!useHumanReadableFloats) {
 			// The floatToHex function is not giving the same results
