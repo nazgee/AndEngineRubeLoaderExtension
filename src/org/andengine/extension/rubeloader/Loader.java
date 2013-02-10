@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,10 +40,11 @@ import java.util.Vector;
 
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
-import org.jbox2d.common.Settings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -58,7 +58,6 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.JointDef;
-import com.badlogic.gdx.physics.box2d.JointDef.JointType;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -86,6 +85,8 @@ import com.badlogic.gdx.physics.box2d.joints.WheelJoint;
  * 
  */
 public class Loader {
+	public static final int MAX_POLY_VERTS = 8;
+
 	protected boolean m_useHumanReadableFloats;
 
 	protected int m_simulationPositionIterations;
@@ -842,16 +843,12 @@ public class Loader {
 	}
 
 	public PhysicsWorld j2b2PhysicsWorld(JSONObject worldValue) throws JSONException {
-		int sim_positionIterations;
-		int sim_velocityIterations;
-		PhysicsWorld world = new PhysicsWorld(jsonToVec("gravity", worldValue));
+		int sim_positionIterations = worldValue.getInt("positionIterations");
+		int sim_velocityIterations = worldValue.getInt("velocityIterations");
+		boolean sim_allowSleep = worldValue.getBoolean("allowSleep");
 
-		world.setAllowSleep(worldValue.getBoolean("allowSleep"));
-//		   "positionIterations" : 3,
-//		   "stepsPerSecond" : 60.0,
-//		   "subStepping" : false,
-//		   "velocityIterations" : 8,
-//		   "warmStarting" : true
+		PhysicsWorld world = new PhysicsWorld(jsonToVec("gravity", worldValue), sim_allowSleep, sim_positionIterations, sim_velocityIterations);
+
 		world.setAutoClearForces(worldValue.getBoolean("autoClearForces"));
 		world.setWarmStarting(worldValue.getBoolean("warmStarting"));
 		world.setContinuousPhysics(worldValue.getBoolean("continuousPhysics"));
@@ -913,18 +910,18 @@ public class Loader {
 		BodyDef bodyDef = new BodyDef();
 		switch (bodyValue.getInt("type")) {
 		case 0:
-			bodyDef.type = BodyType.STATIC;
+			bodyDef.type = BodyType.StaticBody;
 			break;
 		case 1:
-			bodyDef.type = BodyType.KINEMATIC;
+			bodyDef.type = BodyType.KinematicBody;
 			break;
 		case 2:
-			bodyDef.type = BodyType.DYNAMIC;
+			bodyDef.type = BodyType.DynamicBody;
 			break;
 		}
-		bodyDef.position = jsonToVec("position", bodyValue);
+		bodyDef.position.set(jsonToVec("position", bodyValue));
 		bodyDef.angle = jsonToFloat("angle", bodyValue);
-		bodyDef.linearVelocity = jsonToVec("linearVelocity", bodyValue);
+		bodyDef.linearVelocity.set(jsonToVec("linearVelocity", bodyValue));
 		bodyDef.angularVelocity = jsonToFloat("angularVelocity", bodyValue);
 		bodyDef.linearDamping = jsonToFloat("linearDamping", bodyValue, -1, 0);
 		bodyDef.angularDamping = jsonToFloat("angularDamping", bodyValue, -1, 0);
@@ -974,29 +971,31 @@ public class Loader {
 		fixtureDef.density = jsonToFloat("density", fixtureValue);
 		fixtureDef.isSensor = fixtureValue.optBoolean("sensor", false);
 
-		fixtureDef.filter.categoryBits = fixtureValue.optInt("filter-categoryBits", 0x0001);
-		fixtureDef.filter.maskBits = fixtureValue.optInt("filter-maskBits", 0xffff);
-		fixtureDef.filter.groupIndex = fixtureValue.optInt("filter-groupIndex", 0);
+		fixtureDef.filter.categoryBits = (short) fixtureValue.optInt("filter-categoryBits", 0x0001);
+		fixtureDef.filter.maskBits = (short) fixtureValue.optInt("filter-maskBits", 0xffff);
+		fixtureDef.filter.groupIndex = (short) fixtureValue.optInt("filter-groupIndex", 0);
 
 		Fixture fixture = null;
 		if (null != fixtureValue.optJSONObject("circle")) {
 			JSONObject circleValue = fixtureValue.getJSONObject("circle");
 			CircleShape circleShape = new CircleShape();
-			circleShape.m_radius = jsonToFloat("radius", circleValue);
-			circleShape.m_p.set(jsonToVec("center", circleValue));
+			circleShape.setRadius(jsonToFloat("radius", circleValue));
+			circleShape.setPosition((jsonToVec("center", circleValue)));
 			fixtureDef.shape = circleShape;
 			fixture = body.createFixture(fixtureDef);
 		} else if (null != fixtureValue.optJSONObject("edge")) {
 			JSONObject edgeValue = fixtureValue.getJSONObject("edge");
 			EdgeShape edgeShape = new EdgeShape();
-			edgeShape.m_vertex1.set(jsonToVec("vertex1", edgeValue));
-			edgeShape.m_vertex2.set(jsonToVec("vertex2", edgeValue));
-			edgeShape.m_hasVertex0 = edgeValue.optBoolean("hasVertex0", false);
-			edgeShape.m_hasVertex3 = edgeValue.optBoolean("hasVertex3", false);
-			if (edgeShape.m_hasVertex0)
-				edgeShape.m_vertex0.set(jsonToVec("vertex0", edgeValue));
-			if (edgeShape.m_hasVertex3)
-				edgeShape.m_vertex3.set(jsonToVec("vertex3", edgeValue));
+			edgeShape.set(jsonToVec("vertex1", edgeValue), jsonToVec("vertex2", edgeValue));
+
+			// XXX Currently BOX2dAndEngineExtension supports only isolated EdgeShapes 
+//			edgeShape.m_hasVertex0 = edgeValue.optBoolean("hasVertex0", false);
+//			edgeShape.m_hasVertex3 = edgeValue.optBoolean("hasVertex3", false);
+//			if (edgeShape.m_hasVertex0)
+//				edgeShape.m_vertex0.set(jsonToVec("vertex0", edgeValue));
+//			if (edgeShape.m_hasVertex3)
+//				edgeShape.m_vertex3.set(jsonToVec("vertex3", edgeValue));
+
 			fixtureDef.shape = edgeShape;
 			fixture = body.createFixture(fixtureDef);
 		} else if (null != fixtureValue.optJSONObject("loop")) {// support old
@@ -1007,7 +1006,7 @@ public class Loader {
 			Vector2 vertices[] = new Vector2[numVertices];
 			for (int i = 0; i < numVertices; i++)
 				vertices[i].set(jsonToVec("vertices", chainValue, i));
-			chainShape.createLoop(vertices, numVertices);
+			chainShape.createLoop(vertices);
 			fixtureDef.shape = chainShape;
 			fixture = body.createFixture(fixtureDef);
 		} else if (null != fixtureValue.optJSONObject("chain")) {
@@ -1017,35 +1016,39 @@ public class Loader {
 			Vector2 vertices[] = new Vector2[numVertices];
 			for (int i = 0; i < numVertices; i++)
 				vertices[i] = jsonToVec("vertices", chainValue, i);
-			chainShape.createChain(vertices, numVertices);
-			chainShape.m_hasPrevVertex = chainValue.optBoolean("hasPrevVertex", false);
-			chainShape.m_hasNextVertex = chainValue.optBoolean("hasNextVertex", false);
-			if (chainShape.m_hasPrevVertex)
-				chainShape.m_prevVertex.set(jsonToVec("prevVertex", chainValue));
-			if (chainShape.m_hasNextVertex)
-				chainShape.m_nextVertex.set(jsonToVec("nextVertex", chainValue));
+			chainShape.createChain(vertices);
+			if (chainValue.optBoolean("hasPrevVertex", false)) {
+				chainShape.setPrevVertex(jsonToVec("prevVertex", chainValue));
+			}
+			if (chainValue.optBoolean("hasNextVertex", false)) {
+				chainShape.setPrevVertex(jsonToVec("nextVertex", chainValue));
+			}
 			fixtureDef.shape = chainShape;
 			fixture = body.createFixture(fixtureDef);
 		} else if (null != fixtureValue.optJSONObject("polygon")) {
 			JSONObject polygonValue = fixtureValue.getJSONObject("polygon");
-			Vector2 vertices[] = new Vector2[Settings.maxPolygonVertices];
 			int numVertices = polygonValue.getJSONObject("vertices").getJSONArray("x").length();
-			if (numVertices > Settings.maxPolygonVertices) {
+			Vector2 vertices[] = new Vector2[numVertices];
+
+			if (numVertices > MAX_POLY_VERTS) {
 				System.out.println("Ignoring polygon fixture with too many vertices.");
 			} else if (numVertices < 2) {
 				System.out.println("Ignoring polygon fixture less than two vertices.");
 			} else if (numVertices == 2) {
 				System.out.println("Creating edge shape instead of polygon with two vertices.");
 				EdgeShape edgeShape = new EdgeShape();
-				edgeShape.m_vertex1.set(jsonToVec("vertices", polygonValue, 0));
-				edgeShape.m_vertex2.set(jsonToVec("vertices", polygonValue, 1));
+				edgeShape.set(jsonToVec("vertices", polygonValue, 0), jsonToVec("vertices", polygonValue, 1));
 				fixtureDef.shape = edgeShape;
 				fixture = body.createFixture(fixtureDef);
 			} else {
 				PolygonShape polygonShape = new PolygonShape();
-				for (int i = 0; i < numVertices; i++)
+//				Log.d(getClass().getSimpleName(), "parsing poly n="+numVertices + "...");
+				for (int i = 0; i < numVertices; i++) {
 					vertices[i] = jsonToVec("vertices", polygonValue, i);
-				polygonShape.set(vertices, numVertices);
+//					Log.d(getClass().getSimpleName(), "v[" + i + "]=" + vertices[i]);
+				}
+				polygonShape.set(vertices);
+//				Log.d(getClass().getSimpleName(), "... done! parsed poly n="+numVertices);
 				fixtureDef.shape = polygonShape;
 				fixture = body.createFixture(fixtureDef);
 			}
@@ -1086,8 +1089,8 @@ public class Loader {
 		String type = jointValue.optString("type", "");
 		if (type.equals("revolute")) {
 			jointDef = revoluteDef = new RevoluteJointDef();
-			revoluteDef.localAnchorA = jsonToVec("anchorA", jointValue);
-			revoluteDef.localAnchorB = jsonToVec("anchorB", jointValue);
+			revoluteDef.localAnchorA.set(jsonToVec("anchorA", jointValue));
+			revoluteDef.localAnchorB.set(jsonToVec("anchorB", jointValue));
 			revoluteDef.referenceAngle = jsonToFloat("refAngle", jointValue);
 			revoluteDef.enableLimit = jointValue.optBoolean("enableLimit", false);
 			revoluteDef.lowerAngle = jsonToFloat("lowerLimit", jointValue);
@@ -1163,8 +1166,8 @@ public class Loader {
 		// For now, we will make do with a revolute joint.
 		else if (type.equals("wheel")) {
 			jointDef = revoluteDef = new RevoluteJointDef();
-			revoluteDef.localAnchorA = jsonToVec("anchorA", jointValue);
-			revoluteDef.localAnchorB = jsonToVec("anchorB", jointValue);
+			revoluteDef.localAnchorA.set(jsonToVec("anchorA", jointValue));
+			revoluteDef.localAnchorB.set(jsonToVec("anchorB", jointValue));
 			revoluteDef.enableMotor = jointValue.optBoolean("enableMotor", false);
 			revoluteDef.motorSpeed = jsonToFloat("motorSpeed", jointValue);
 			revoluteDef.maxMotorTorque = jsonToFloat("maxMotorTorque", jointValue);
