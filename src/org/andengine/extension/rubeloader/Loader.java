@@ -80,7 +80,7 @@ import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
  * 
  * 
  */
-public class Jb2dJson {
+public class Loader {
 	protected boolean m_useHumanReadableFloats;
 
 	protected int m_simulationPositionIterations;
@@ -109,11 +109,11 @@ public class Jb2dJson {
 	protected Set<Image> m_imagesWithCustomProperties;
 	protected Set<PhysicsWorld> m_worldsWithCustomProperties;
 
-	public Jb2dJson() {
+	public Loader() {
 		this(true);
 	}
 
-	public Jb2dJson(boolean useHumanReadableFloats) {
+	public Loader(boolean useHumanReadableFloats) {
 
 		if (!useHumanReadableFloats) {
 			// The floatToHex function is not giving the same results
