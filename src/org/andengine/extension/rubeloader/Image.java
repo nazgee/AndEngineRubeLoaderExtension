@@ -30,25 +30,24 @@ import com.badlogic.gdx.math.Vector2;
  *
  */
 public class Image {
+	public String name;
+	public String file;
+	public Body body;
+	public Vector2 center;
+	public float angle;
+	public float scale;
+	public boolean flip;
+	public float opacity;
+	public int filter; // 0 = nearest, 1 = linear
+	public float renderOrder;
 
-    String name;
-    String file;
-    Body body;
-    Vector2 center;
-    float angle;
-    float scale;
-    boolean flip;
-    float opacity;
-    int filter; // 0 = nearest, 1 = linear
-    float renderOrder;
+	public Vector2 corners[];
 
-    Vector2 corners[];
-
-    int numPoints;
-    float points[];
-    float uvCoords[];
-    int numIndices;
-    short indices[];
+	public int numPoints;
+	public float points[];
+	public float uvCoords[];
+	public int numIndices;
+	public short indices[];
 
 }
 
