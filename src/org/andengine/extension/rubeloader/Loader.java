@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.jbox2d.common.Settings;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,6 +66,7 @@ import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
+import com.badlogic.gdx.physics.box2d.joints.GearJoint;
 import com.badlogic.gdx.physics.box2d.joints.GearJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
@@ -73,8 +76,10 @@ import com.badlogic.gdx.physics.box2d.joints.PulleyJoint;
 import com.badlogic.gdx.physics.box2d.joints.PulleyJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
+import com.badlogic.gdx.physics.box2d.joints.RopeJoint;
 import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
+import com.badlogic.gdx.physics.box2d.joints.WheelJoint;
 
 /**
  * 
@@ -149,100 +154,101 @@ public class Loader {
 		m_worldsWithCustomProperties = new HashSet<PhysicsWorld>();
 	}
 
-	public JSONObject writeToValue(PhysicsWorld world) throws JSONException {
-		if (null == world)
-			return new JSONObject();
-
-		return b2j(world);
-	}
-
-	public String worldToString(PhysicsWorld world, int indentFactor) throws JSONException {
-		if (null == world)
-			return new String();
-
-		return b2j(world).toString(indentFactor);
-	}
-
-	public boolean writeToFile(PhysicsWorld world, String filename, int indentFactor, StringBuilder errorMsg) {
-		if (null == world || null == filename)
-			return false;
-
-		PrintWriter writer;
-		try {
-			writer = new PrintWriter(filename);
-		} catch (FileNotFoundException e) {
-			errorMsg.append("Could not open file " + filename + "for writing");
-			return false;
-		}
-
-		try {
-			writer.println(b2j(world).toString(indentFactor));
-		} catch (JSONException e) {
-			errorMsg.append("Error writing JSON to file: " + filename);
-		}
-		writer.close();
-
-		return true;
-	}
-
-	public JSONObject b2j(PhysicsWorld world) throws JSONException {
-		JSONObject worldValue = new JSONObject();
-
-		m_bodyToIndexMap.clear();
-		m_jointToIndexMap.clear();
-
-		vecToJson("gravity", world.getGravity(), worldValue);
-		worldValue.put("allowSleep", world.isAllowSleep());
-		worldValue.put("autoClearForces", world.getAutoClearForces());
-		worldValue.put("warmStarting", world.isWarmStarting());
-		worldValue.put("continuousPhysics", world.isContinuousPhysics());
-		// worldValue.put("subStepping", world.isSubStepping());
-		// worldValue["hasDestructionListener"] =
-		// world->HasDestructionListener();
-		// worldValue["hasContactFilter"] = world->HasContactFilter();
-		// worldValue["hasContactListener"] = world->HasContactListener();
-
-		JSONArray customPropertyValue = writeCustomPropertiesToJson(null);
-		if (customPropertyValue.length() > 0)
-			worldValue.put("customProperties", customPropertyValue);
-
-		int i = 0;
-		for (Body body = world.getBodyList(); null != body; body = body.getNext()) {
-			m_bodyToIndexMap.put(body, i);
-			worldValue.append("body", b2j(body));
-			i++;
-		}
-
-		// need two passes for joints because gear joints reference other joints
-		i = 0;
-		for (Joint joint = world.getJointList(); null != joint; joint = joint.getNext()) {
-			if (joint.getType() == JointType.GEAR)
-				continue;
-			m_jointToIndexMap.put(joint, i);
-			worldValue.append("joint", b2j(joint));
-			i++;
-		}
-		for (Joint joint = world.getJointList(); null != joint; joint = joint.getNext()) {
-			if (joint.getType() != JointType.GEAR)
-				continue;
-			m_jointToIndexMap.put(joint, i);
-			worldValue.append("joint", b2j(joint));
-			i++;
-		}
-
-		// Currently the only efficient way to add images to a Jb2dJson
-		// is by using the R.U.B.E editor. This code has not been tested,
-		// but should work ok.
-		i = 0;
-		for (Image image : m_imageToNameMap.keySet()) {
-			worldValue.append("image", b2j(image));
-		}
-
-		m_bodyToIndexMap.clear();
-		m_jointToIndexMap.clear();
-
-		return worldValue;
-	}
+	// TODO Use this section to enable worlds saving
+//	public JSONObject writeToValue(PhysicsWorld world) throws JSONException {
+//		if (null == world)
+//			return new JSONObject();
+//
+//		return b2j(world);
+//	}
+//
+//	public String worldToString(PhysicsWorld world, int indentFactor) throws JSONException {
+//		if (null == world)
+//			return new String();
+//
+//		return b2j(world).toString(indentFactor);
+//	}
+//
+//	public boolean writeToFile(PhysicsWorld world, String filename, int indentFactor, StringBuilder errorMsg) {
+//		if (null == world || null == filename)
+//			return false;
+//
+//		PrintWriter writer;
+//		try {
+//			writer = new PrintWriter(filename);
+//		} catch (FileNotFoundException e) {
+//			errorMsg.append("Could not open file " + filename + "for writing");
+//			return false;
+//		}
+//
+//		try {
+//			writer.println(b2j(world).toString(indentFactor));
+//		} catch (JSONException e) {
+//			errorMsg.append("Error writing JSON to file: " + filename);
+//		}
+//		writer.close();
+//
+//		return true;
+//	}
+//
+//	public JSONObject b2j(PhysicsWorld world) throws JSONException {
+//		JSONObject worldValue = new JSONObject();
+//
+//		m_bodyToIndexMap.clear();
+//		m_jointToIndexMap.clear();
+//
+//		vecToJson("gravity", world.getGravity(), worldValue);
+//		worldValue.put("allowSleep", world.isAllowSleep());
+//		worldValue.put("autoClearForces", world.getAutoClearForces());
+//		worldValue.put("warmStarting", world.isWarmStarting());
+//		worldValue.put("continuousPhysics", world.isContinuousPhysics());
+//		// worldValue.put("subStepping", world.isSubStepping());
+//		// worldValue["hasDestructionListener"] =
+//		// world->HasDestructionListener();
+//		// worldValue["hasContactFilter"] = world->HasContactFilter();
+//		// worldValue["hasContactListener"] = world->HasContactListener();
+//
+//		JSONArray customPropertyValue = writeCustomPropertiesToJson(null);
+//		if (customPropertyValue.length() > 0)
+//			worldValue.put("customProperties", customPropertyValue);
+//
+//		int i = 0;
+//		for (Body body = world.getBodyList(); null != body; body = body.getNext()) {
+//			m_bodyToIndexMap.put(body, i);
+//			worldValue.append("body", b2j(body));
+//			i++;
+//		}
+//
+//		// need two passes for joints because gear joints reference other joints
+//		i = 0;
+//		for (Joint joint = world.getJointList(); null != joint; joint = joint.getNext()) {
+//			if (joint.getType() == JointType.GEAR)
+//				continue;
+//			m_jointToIndexMap.put(joint, i);
+//			worldValue.append("joint", b2j(joint));
+//			i++;
+//		}
+//		for (Joint joint = world.getJointList(); null != joint; joint = joint.getNext()) {
+//			if (joint.getType() != JointType.GEAR)
+//				continue;
+//			m_jointToIndexMap.put(joint, i);
+//			worldValue.append("joint", b2j(joint));
+//			i++;
+//		}
+//
+//		// Currently the only efficient way to add images to a Jb2dJson
+//		// is by using the R.U.B.E editor. This code has not been tested,
+//		// but should work ok.
+//		i = 0;
+//		for (Image image : m_imageToNameMap.keySet()) {
+//			worldValue.append("image", b2j(image));
+//		}
+//
+//		m_bodyToIndexMap.clear();
+//		m_jointToIndexMap.clear();
+//
+//		return worldValue;
+//	}
 
 	public void setBodyName(Body body, String name) {
 		m_bodyToNameMap.put(body, name);
@@ -268,13 +274,13 @@ public class Loader {
 			bodyValue.put("name", bodyName);
 
 		switch (body.getType()) {
-		case STATIC:
+		case StaticBody:
 			bodyValue.put("type", 0);
 			break;
-		case KINEMATIC:
+		case KinematicBody:
 			bodyValue.put("type", 1);
 			break;
-		case DYNAMIC:
+		case DynamicBody:
 			bodyValue.put("type", 2);
 			break;
 		}
@@ -303,8 +309,7 @@ public class Loader {
 		if (body.isFixedRotation())
 			bodyValue.put("fixedRotation", true);
 
-		MassData massData = new MassData();
-		body.getMassData(massData);
+		MassData massData = body.getMassData();
 		if (massData.mass != 0)
 			floatToJson("massData-mass", massData.mass, bodyValue);
 		if (massData.center.x != 0 || massData.center.y != 0)
@@ -313,9 +318,12 @@ public class Loader {
 			floatToJson("massData-I", massData.I, bodyValue);
 		}
 
-		int i = 0;
-		for (Fixture fixture = body.getFixtureList(); null != fixture; fixture = fixture.getNext())
-			bodyValue.append("fixture", b2j(fixture));
+
+		ArrayList<Fixture> fixtures = body.getFixtureList();
+		for (Iterator<Fixture> iter = fixtures.iterator(); iter.hasNext();) {
+			Fixture fixture = (Fixture) iter.next();
+			bodyValue.accumulate("fixture", b2j(fixture));
+		}
 
 		JSONArray customPropertyValue = writeCustomPropertiesToJson(body);
 		if (customPropertyValue.length() > 0)
@@ -350,53 +358,75 @@ public class Loader {
 
 		Shape shape = fixture.getShape();
 		switch (shape.getType()) {
-		case CIRCLE: {
+		case Circle: {
 			CircleShape circle = (CircleShape) shape;
 			JSONObject shapeValue = new JSONObject();
-			floatToJson("radius", circle.m_radius, shapeValue);
-			vecToJson("center", circle.m_p, shapeValue);
+			floatToJson("radius", circle.getRadius(), shapeValue);
+			vecToJson("center", circle.getPosition(), shapeValue);
 			fixtureValue.put("circle", shapeValue);
 		}
 			break;
-		case EDGE: {
+		case Edge: {
 			EdgeShape edge = (EdgeShape) shape;
 			JSONObject shapeValue = new JSONObject();
-			vecToJson("vertex1", edge.m_vertex1, shapeValue);
-			vecToJson("vertex2", edge.m_vertex2, shapeValue);
-			if (edge.m_hasVertex0)
-				shapeValue.put("hasVertex0", true);
-			if (edge.m_hasVertex3)
-				shapeValue.put("hasVertex3", true);
-			if (edge.m_hasVertex0)
-				vecToJson("vertex0", edge.m_vertex0, shapeValue);
-			if (edge.m_hasVertex3)
-				vecToJson("vertex3", edge.m_vertex3, shapeValue);
+
+			Vector2 v1 = Vector2Pool.obtain();
+			Vector2 v2 = Vector2Pool.obtain();
+			edge.getVertex1(v1);
+			edge.getVertex2(v2);
+			vecToJson("vertex1", v1, shapeValue);
+			vecToJson("vertex2", v2, shapeValue);
+			Vector2Pool.recycle(v1);
+			Vector2Pool.recycle(v2);
+
+			// TODO Use it when B2D extension will start exposing this info
+//			if (edge.m_hasVertex0)
+//				shapeValue.put("hasVertex0", true);
+//			if (edge.m_hasVertex3)
+//				shapeValue.put("hasVertex3", true);
+//			if (edge.m_hasVertex0)
+//				vecToJson("vertex0", edge.m_vertex0, shapeValue);
+//			if (edge.m_hasVertex3)
+//				vecToJson("vertex3", edge.m_vertex3, shapeValue);
 			fixtureValue.put("edge", shapeValue);
 		}
 			break;
-		case CHAIN: {
+		case Chain: {
 			ChainShape chain = (ChainShape) shape;
 			JSONObject shapeValue = new JSONObject();
-			int count = chain.m_count;
-			for (int i = 0; i < count; ++i)
-				vecToJson("vertices", chain.m_vertices[i], shapeValue, i);
-			if (chain.m_hasPrevVertex)
-				shapeValue.put("hasPrevVertex", true);
-			if (chain.m_hasNextVertex)
-				shapeValue.put("hasNextVertex", true);
-			if (chain.m_hasPrevVertex)
-				vecToJson("prevVertex", chain.m_prevVertex, shapeValue);
-			if (chain.m_hasNextVertex)
-				vecToJson("nextVertex", chain.m_nextVertex, shapeValue);
+
+			int count = chain.getVertexCount();
+			Vector2 v = Vector2Pool.obtain();
+			for (int i = 0; i < count; ++i) {
+				chain.getVertex(i, v);
+				vecToJson("vertices", v, shapeValue, i);
+			}
+			Vector2Pool.recycle(v);
+
+			// TODO Use it when B2D extension will start exposing this info
+//			if (chain.m_hasPrevVertex)
+//				shapeValue.put("hasPrevVertex", true);
+//			if (chain.m_hasNextVertex)
+//				shapeValue.put("hasNextVertex", true);
+//			if (chain.m_hasPrevVertex)
+//				vecToJson("prevVertex", chain.m_prevVertex, shapeValue);
+//			if (chain.m_hasNextVertex)
+//				vecToJson("nextVertex", chain.m_nextVertex, shapeValue);
 			fixtureValue.put("chain", shapeValue);
 		}
 			break;
-		case POLYGON: {
+		case Polygon: {
 			PolygonShape poly = (PolygonShape) shape;
 			JSONObject shapeValue = new JSONObject();
 			int vertexCount = poly.getVertexCount();
-			for (int i = 0; i < vertexCount; ++i)
-				vecToJson("vertices", poly.m_vertices[i], shapeValue, i);
+
+			Vector2 v = Vector2Pool.obtain();
+			for (int i = 0; i < vertexCount; ++i) {
+				poly.getVertex(i, v);
+				vecToJson("vertices", v, shapeValue, i);
+			}
+			Vector2Pool.recycle(v);
+
 			fixtureValue.put("polygon", shapeValue);
 		}
 			break;
@@ -422,25 +452,21 @@ public class Loader {
 		int bodyIndexB = lookupBodyIndex(joint.getBodyB());
 		jointValue.put("bodyA", bodyIndexA);
 		jointValue.put("bodyB", bodyIndexB);
-		if (joint.getCollideConnected())
-			jointValue.put("collideConnected", true);
+
+		// XXX we do not have this info available!
+//		if (joint.getCollideConnected())
+//			jointValue.put("collideConnected", true);
 
 		Body bodyA = joint.getBodyA();
 		Body bodyB = joint.getBodyB();
 
-		// why do Joint.getAnchor methods need to take an argOut style
-		// parameter!?
-		Vector2 tmpAnchor = new Vector2();
-
 		switch (joint.getType()) {
-		case REVOLUTE: {
+		case RevoluteJoint: {
 			jointValue.put("type", "revolute");
 
 			RevoluteJoint revoluteJoint = (RevoluteJoint) joint;
-			revoluteJoint.getAnchorA(tmpAnchor);
-			vecToJson("anchorA", bodyA.getLocalPoint(tmpAnchor), jointValue);
-			revoluteJoint.getAnchorB(tmpAnchor);
-			vecToJson("anchorB", bodyB.getLocalPoint(tmpAnchor), jointValue);
+			vecToJson("anchorA", bodyA.getLocalPoint(revoluteJoint.getAnchorA()), jointValue);
+			vecToJson("anchorB", bodyB.getLocalPoint(revoluteJoint.getAnchorB()), jointValue);
 			floatToJson("refAngle", bodyB.getAngle() - bodyA.getAngle() - revoluteJoint.getJointAngle(), jointValue);
 			floatToJson("jointSpeed", revoluteJoint.getJointSpeed(), jointValue);
 			jointValue.put("enableLimit", revoluteJoint.isLimitEnabled());
@@ -448,143 +474,122 @@ public class Loader {
 			floatToJson("upperLimit", revoluteJoint.getUpperLimit(), jointValue);
 			jointValue.put("enableMotor", revoluteJoint.isMotorEnabled());
 			floatToJson("motorSpeed", revoluteJoint.getMotorSpeed(), jointValue);
-			floatToJson("maxMotorTorque", revoluteJoint.getMaxMotorTorque(), jointValue);
+			// XXX what is this parameter?
+//			floatToJson("maxMotorTorque", revoluteJoint.getMaxMotorTorque(), jointValue);
+			floatToJson("maxMotorTorque", revoluteJoint.getMotorTorque(1), jointValue);
 		}
 			break;
-		case PRISMATIC: {
+		case PrismaticJoint: {
 			jointValue.put("type", "prismatic");
 
 			PrismaticJoint prismaticJoint = (PrismaticJoint) joint;
-			prismaticJoint.getAnchorA(tmpAnchor);
-			vecToJson("anchorA", bodyA.getLocalPoint(tmpAnchor), jointValue);
-			prismaticJoint.getAnchorB(tmpAnchor);
-			vecToJson("anchorB", bodyB.getLocalPoint(tmpAnchor), jointValue);
-			vecToJson("localAxisA", prismaticJoint.getLocalAxisA(), jointValue);
-			floatToJson("refAngle", prismaticJoint.getReferenceAngle(), jointValue);
+			vecToJson("anchorA", bodyA.getLocalPoint(prismaticJoint.getAnchorA()), jointValue);
+			vecToJson("anchorB", bodyB.getLocalPoint(prismaticJoint.getAnchorB()), jointValue);
+			// XXX not really sure how I should handle this...
+//			vecToJson("localAxisA", prismaticJoint.getLocalAxisA(), jointValue);
+//			floatToJson("refAngle", prismaticJoint.getReferenceAngle(), jointValue);
 			jointValue.put("enableLimit", prismaticJoint.isLimitEnabled());
 			floatToJson("lowerLimit", prismaticJoint.getLowerLimit(), jointValue);
 			floatToJson("upperLimit", prismaticJoint.getUpperLimit(), jointValue);
 			jointValue.put("enableMotor", prismaticJoint.isMotorEnabled());
-			floatToJson("maxMotorForce", prismaticJoint.getMaxMotorForce(), jointValue);
+			// XXX what is this parameter?
+//			floatToJson("maxMotorForce", prismaticJoint.getMaxMotorForce(), jointValue);
+			floatToJson("maxMotorForce", prismaticJoint.getMotorForce(1), jointValue);
 			floatToJson("motorSpeed", prismaticJoint.getMotorSpeed(), jointValue);
 		}
 			break;
-		case DISTANCE: {
+		case DistanceJoint: {
 			jointValue.put("type", "distance");
 
 			DistanceJoint distanceJoint = (DistanceJoint) joint;
-			distanceJoint.getAnchorA(tmpAnchor);
-			vecToJson("anchorA", bodyA.getLocalPoint(tmpAnchor), jointValue);
-			distanceJoint.getAnchorB(tmpAnchor);
-			vecToJson("anchorB", bodyB.getLocalPoint(tmpAnchor), jointValue);
+			vecToJson("anchorA", bodyA.getLocalPoint(distanceJoint.getAnchorA()), jointValue);
+			vecToJson("anchorB", bodyB.getLocalPoint(distanceJoint.getAnchorB()), jointValue);
 			floatToJson("length", distanceJoint.getLength(), jointValue);
 			floatToJson("frequency", distanceJoint.getFrequency(), jointValue);
 			floatToJson("dampingRatio", distanceJoint.getDampingRatio(), jointValue);
 		}
 			break;
-		case PULLEY: {
+		case PulleyJoint: {
 			jointValue.put("type", "pulley");
 
 			PulleyJoint pulleyJoint = (PulleyJoint) joint;
 			vecToJson("groundAnchorA", pulleyJoint.getGroundAnchorA(), jointValue);
 			vecToJson("groundAnchorB", pulleyJoint.getGroundAnchorB(), jointValue);
-			pulleyJoint.getAnchorA(tmpAnchor);
+			Vector2 tmpAnchor = pulleyJoint.getAnchorA();
 			vecToJson("anchorA", bodyA.getLocalPoint(tmpAnchor), jointValue);
-			floatToJson("lengthA", (pulleyJoint.getGroundAnchorA().sub(tmpAnchor)).length(), jointValue);
-			pulleyJoint.getAnchorB(tmpAnchor);
+			floatToJson("lengthA", (pulleyJoint.getGroundAnchorA().sub(tmpAnchor)).len(), jointValue);
+			tmpAnchor = pulleyJoint.getAnchorB();
 			vecToJson("anchorB", bodyB.getLocalPoint(tmpAnchor), jointValue);
-			floatToJson("lengthB", (pulleyJoint.getGroundAnchorB().sub(tmpAnchor)).length(), jointValue);
+			floatToJson("lengthB", (pulleyJoint.getGroundAnchorB().sub(tmpAnchor)).len(), jointValue);
 			floatToJson("ratio", pulleyJoint.getRatio(), jointValue);
 		}
 			break;
-		case MOUSE: {
+		case MouseJoint: {
 			jointValue.put("type", "mouse");
 
 			MouseJoint mouseJoint = (MouseJoint) joint;
 			vecToJson("target", mouseJoint.getTarget(), jointValue);
-			mouseJoint.getAnchorB(tmpAnchor);
-			vecToJson("anchorB", tmpAnchor, jointValue);
+			vecToJson("anchorB", mouseJoint.getAnchorB(), jointValue);
 			floatToJson("maxForce", mouseJoint.getMaxForce(), jointValue);
 			floatToJson("frequency", mouseJoint.getFrequency(), jointValue);
 			floatToJson("dampingRatio", mouseJoint.getDampingRatio(), jointValue);
 		}
 			break;
-		case GEAR: {
-			// Wheel joints are apparently not implemented in JBox2D yet, but
-			// when they are, commenting out the following section should work.
-			/*
-			 * jointValue.put("type", "gear");
-			 * 
-			 * GearJoint gearJoint = (GearJoint)joint; int jointIndex1 =
-			 * lookupJointIndex( gearJoint.getJoint1() ); int jointIndex2 =
-			 * lookupJointIndex( gearJoint.getJoint2() );
-			 * jointValue.put("joint1", jointIndex1); jointValue.put("joint2",
-			 * jointIndex2); jointValue.put("ratio", gearJoint.getRatio());
-			 */
+		case GearJoint: {
+			jointValue.put("type", "gear");
+			GearJoint gearJoint = (GearJoint)joint;
+			// XXX we do not have this info available!
+//			int jointIndex1 = lookupJointIndex( gearJoint.getJoint1() );
+//			int jointIndex2 = lookupJointIndex( gearJoint.getJoint2() );
+//			jointValue.put("joint1", jointIndex1);
+//			jointValue.put("joint2", jointIndex2);
+			jointValue.put("ratio", gearJoint.getRatio());
 		}
 			break;
-		case WHEEL: {
-			// Wheel joints are apparently not implemented in JBox2D yet, but
-			// when they are, commenting out the following section... might
-			// work.
-			/*
-			 * jointValue.put("type", "wheel");
-			 * 
-			 * WheelJoint wheelJoint = (WheelJoint)joint;
-			 * wheelJoint.getAnchorA(tmpAnchor); vecToJson("anchorA",
-			 * bodyA.getLocalPoint(tmpAnchor), jointValue);
-			 * wheelJoint.getAnchorB(tmpAnchor); vecToJson("anchorB",
-			 * bodyB.getLocalPoint(tmpAnchor), jointValue);
-			 * vecToJson("localAxisA", wheelJoint.getLocalAxisA(), jointValue);
-			 * jointValue.put("enableMotor", wheelJoint.isMotorEnabled());
-			 * floatToJson("motorSpeed", wheelJoint.getMotorSpeed(),
-			 * jointValue); floatToJson("maxMotorTorque",
-			 * wheelJoint.getMaxMotorTorque(), jointValue);
-			 * floatToJson("springFrequency", wheelJoint.getSpringFrequencyHz(),
-			 * jointValue); floatToJson("springDampingRatio",
-			 * wheelJoint.getSpringDampingRatio(), jointValue);
-			 */
+		case WheelJoint: {
+			jointValue.put("type", "wheel");
+			WheelJoint wheelJoint = (WheelJoint)joint;
+			vecToJson("anchorA", bodyA.getLocalPoint(wheelJoint.getAnchorA()), jointValue);
+			vecToJson("anchorB", bodyB.getLocalPoint(wheelJoint.getAnchorB()), jointValue);
+			// XXX not really sure how I should handle this...
+//			vecToJson("localAxisA", wheelJoint.getLocalAxisA(), jointValue);
+			// XXX we do not have this info available!
+//			jointValue.put("enableMotor", wheelJoint.isMotorEnabled());
+			floatToJson("motorSpeed", wheelJoint.getMotorSpeed(), jointValue);
+			floatToJson("maxMotorTorque", wheelJoint.getMaxMotorTorque(), jointValue);
+			floatToJson("springFrequency", wheelJoint.getSpringFrequencyHz(), jointValue);
+			floatToJson("springDampingRatio", wheelJoint.getSpringDampingRatio(), jointValue);
 		}
 			break;
-		case WELD: {
+		case WeldJoint: {
 			jointValue.put("type", "weld");
 
 			WeldJoint weldJoint = (WeldJoint) joint;
-			weldJoint.getAnchorA(tmpAnchor);
-			vecToJson("anchorA", bodyA.getLocalPoint(tmpAnchor), jointValue);
-			weldJoint.getAnchorB(tmpAnchor);
-			vecToJson("anchorB", bodyB.getLocalPoint(tmpAnchor), jointValue);
-			floatToJson("refAngle", weldJoint.getReferenceAngle(), jointValue);
+			vecToJson("anchorA", bodyA.getLocalPoint(weldJoint.getAnchorA()), jointValue);
+			vecToJson("anchorB", bodyB.getLocalPoint(weldJoint.getAnchorB()), jointValue);
+			// XXX we do not have this info available!
+//			floatToJson("refAngle", weldJoint.getReferenceAngle(), jointValue);
 		}
 			break;
-		case FRICTION: {
+		case FrictionJoint: {
 			jointValue.put("type", "friction");
 
 			FrictionJoint frictionJoint = (FrictionJoint) joint;
-			frictionJoint.getAnchorA(tmpAnchor);
-			vecToJson("anchorA", bodyA.getLocalPoint(tmpAnchor), jointValue);
-			frictionJoint.getAnchorB(tmpAnchor);
-			vecToJson("anchorB", bodyB.getLocalPoint(tmpAnchor), jointValue);
+			vecToJson("anchorA", bodyA.getLocalPoint(frictionJoint.getAnchorA()), jointValue);
+			vecToJson("anchorB", bodyB.getLocalPoint(frictionJoint.getAnchorB()), jointValue);
 			floatToJson("maxForce", frictionJoint.getMaxForce(), jointValue);
 			floatToJson("maxTorque", frictionJoint.getMaxTorque(), jointValue);
 		}
 			break;
-		case ROPE: {
-			// Rope joints are apparently not implemented in JBox2D yet, but
-			// when they are, commenting out the following section should work.
-			/*
-			 * jointValue.put("type", "rope");
-			 * 
-			 * RopeJoint ropeJoint = (RopeJoint)joint;
-			 * ropeJoint.getAnchorA(tmpAnchor); vecToJson("anchorA",
-			 * bodyA.getLocalPoint(tmpAnchor), jointValue);
-			 * ropeJoint.getAnchorB(tmpAnchor); vecToJson("anchorB",
-			 * bodyB.getLocalPoint(tmpAnchor), jointValue);
-			 * floatToJson("maxLength", ropeJoint.getMaxLength(), jointValue);
-			 */
+		case RopeJoint: {
+			jointValue.put("type", "rope");
+			RopeJoint ropeJoint = (RopeJoint)joint;
+			vecToJson("anchorA", bodyA.getLocalPoint(ropeJoint.getAnchorA()), jointValue);
+			vecToJson("anchorB", bodyB.getLocalPoint(ropeJoint.getAnchorB()), jointValue);
+			floatToJson("maxLength", ropeJoint.getMaxLength(), jointValue);
 		}
 			break;
-		case UNKNOWN:
+		case Unknown:
 		default:
 			System.out.println("Unknown joint type : " + joint.getType());
 		}
@@ -837,10 +842,16 @@ public class Loader {
 	}
 
 	public PhysicsWorld j2b2PhysicsWorld(JSONObject worldValue) throws JSONException {
+		int sim_positionIterations;
+		int sim_velocityIterations;
 		PhysicsWorld world = new PhysicsWorld(jsonToVec("gravity", worldValue));
 
 		world.setAllowSleep(worldValue.getBoolean("allowSleep"));
-
+//		   "positionIterations" : 3,
+//		   "stepsPerSecond" : 60.0,
+//		   "subStepping" : false,
+//		   "velocityIterations" : 8,
+//		   "warmStarting" : true
 		world.setAutoClearForces(worldValue.getBoolean("autoClearForces"));
 		world.setWarmStarting(worldValue.getBoolean("warmStarting"));
 		world.setContinuousPhysics(worldValue.getBoolean("continuousPhysics"));
