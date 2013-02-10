@@ -1437,7 +1437,7 @@ public class Loader {
 	}
 
 	protected void setCustomFloat(Object item, String propertyName, float val) {
-		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, new Double(val));
+		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
 	}
 
 	protected void setCustomString(Object item, String propertyName, String val) {
@@ -1460,7 +1460,7 @@ public class Loader {
 
 	public void setCustomFloat(Body item, String propertyName, float val) {		
 		m_bodiesWithCustomProperties.add(item);
-		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, new Double(val));
+		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
 	}
 
 	public void setCustomString(Body item, String propertyName, String val) {
@@ -1486,7 +1486,7 @@ public class Loader {
 
 	public void setCustomFloat(Fixture item, String propertyName, float val) {
 		m_fixturesWithCustomProperties.add(item);
-		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, new Double(val));
+		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
 	}
 
 	public void setCustomString(Fixture item, String propertyName, String val) {
@@ -1512,7 +1512,7 @@ public class Loader {
 
 	public void setCustomFloat(Joint item, String propertyName, float val) {
 		m_jointsWithCustomProperties.add(item);
-		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, new Double(val));
+		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
 	}
 
 	public void setCustomString(Joint item, String propertyName, String val) {
@@ -1538,7 +1538,7 @@ public class Loader {
 
 	public void setCustomFloat(Image item, String propertyName, float val) {
 		m_imagesWithCustomProperties.add(item);
-		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, new Double(val));
+		getCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
 	}
 
 	public void setCustomString(Image item, String propertyName, String val) {
@@ -1592,7 +1592,7 @@ public class Loader {
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_int.containsKey(propertyName))
-			return props.m_customPropertyMap_int.get(propertyName);
+			return (Integer) props.m_customPropertyMap_int.get(propertyName);
 		return defaultVal;
 	}
 
@@ -1601,7 +1601,7 @@ public class Loader {
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_float.containsKey(propertyName))
-			return props.m_customPropertyMap_float.get(propertyName).floatValue();
+			return (Float)props.m_customPropertyMap_float.get(propertyName);
 		return defaultVal;
 	}
 
@@ -1610,7 +1610,7 @@ public class Loader {
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_string.containsKey(propertyName))
-			return props.m_customPropertyMap_string.get(propertyName);
+			return (String) props.m_customPropertyMap_string.get(propertyName);
 		return defaultVal;
 	}
 
@@ -1619,7 +1619,7 @@ public class Loader {
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_vec2.containsKey(propertyName))
-			return props.m_customPropertyMap_vec2.get(propertyName);
+			return (Vector2) props.m_customPropertyMap_vec2.get(propertyName);
 		return defaultVal;
 	}
 
@@ -1628,7 +1628,7 @@ public class Loader {
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_bool.containsKey(propertyName))
-			return props.m_customPropertyMap_bool.get(propertyName);
+			return (Boolean) props.m_customPropertyMap_bool.get(propertyName);
 		return defaultVal;
 	}
 
@@ -2060,9 +2060,9 @@ public class Loader {
 			}
 		}
 		{
-			Iterator<Entry<String, Double>> it = props.m_customPropertyMap_float.entrySet().iterator();
+			Iterator<Entry<String, Float>> it = props.m_customPropertyMap_float.entrySet().iterator();
 			while (it.hasNext()) {
-				Entry<String, Double> pair = (Entry<String, Double>) it.next();
+				Entry<String, Float> pair = (Entry<String, Float>) it.next();
 				JSONObject propValue = new JSONObject();
 				propValue.put("name", pair.getKey());
 				propValue.put("float", pair.getValue());
