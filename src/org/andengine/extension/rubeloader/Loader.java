@@ -1345,6 +1345,44 @@ public class Loader {
 		return vec;
 	}
 
+	int jsonToInt(String name, JSONObject value) throws JSONException {
+		return jsonToInt(name, value, -1, 0);
+	}
+
+	int jsonToInt(String name, JSONObject value, int index) throws JSONException {
+		return jsonToInt(name, value, index, 0);
+	}
+
+	int jsonToInt(String name, JSONObject value, int index, int defaultValue) throws JSONException {
+		if (!value.has(name))
+			return defaultValue;
+
+		if (index > -1) {
+			JSONArray array = null;
+			try {
+				array = value.getJSONArray(name);
+			} catch (JSONException e) {
+			}
+			if (null == array)
+				return defaultValue;
+			Object obj = array.opt(index);
+			if (null == obj)
+				return defaultValue;
+			// else if ( value[name].isString() )
+			// return hexToFloat( value[name].asString() );
+			else
+				return ((Number) obj).intValue();
+		} else {
+			Object obj = value.opt(name);
+			if (null == obj)
+				return defaultValue;
+			// else if ( value[name].isString() )
+			// return hexToFloat( value[name].asString() );
+			else
+				return ((Number) obj).intValue();
+		}
+	}
+
 	public Body[] getBodiesByName(String name) {
 		Set<Body> keys = new HashSet<Body>();
 		for (Entry<Body, String> entry : m_bodyToNameMap.entrySet()) {
