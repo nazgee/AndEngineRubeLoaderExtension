@@ -81,25 +81,6 @@ import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
  * 
  */
 public class Jb2dJson {
-
-	public class Jb2dJsonCustomProperties {
-
-		Map<String, Integer> m_customPropertyMap_int;
-		Map<String, Double> m_customPropertyMap_float;
-		Map<String, String> m_customPropertyMap_string;
-		Map<String, Vector2> m_customPropertyMap_vec2;
-		Map<String, Boolean> m_customPropertyMap_bool;
-		
-		public Jb2dJsonCustomProperties() {
-			m_customPropertyMap_int = new HashMap<String, Integer>();
-			m_customPropertyMap_float = new HashMap<String, Double>();
-			m_customPropertyMap_string = new HashMap<String, String>();
-			m_customPropertyMap_vec2 = new HashMap<String, Vector2>();
-			m_customPropertyMap_bool = new HashMap<String, Boolean>();
-		}
-
-	}
-
 	protected boolean m_useHumanReadableFloats;
 
 	protected int m_simulationPositionIterations;
@@ -120,7 +101,7 @@ public class Jb2dJson {
 
 	// This maps an item (Body, Fixture etc) to a set of custom properties.
 	// Use null for world properties.
-	protected Map<Object, Jb2dJsonCustomProperties> m_customPropertiesMap;
+	protected Map<Object, CustomProperties> m_customPropertiesMap;
 	
 	protected Set<Body> m_bodiesWithCustomProperties;
 	protected Set<Fixture> m_fixturesWithCustomProperties;
@@ -159,7 +140,7 @@ public class Jb2dJson {
 		m_jointToNameMap = new HashMap<Joint, String>();
 		m_imageToNameMap = new HashMap<Image, String>();
 		
-		m_customPropertiesMap = new HashMap<Object, Jb2dJsonCustomProperties>();
+		m_customPropertiesMap = new HashMap<Object, CustomProperties>();
 		
 		m_bodiesWithCustomProperties = new HashSet<Body>();
 		m_fixturesWithCustomProperties = new HashSet<Fixture>();
@@ -1435,7 +1416,7 @@ public class Jb2dJson {
 
 	// //// custom properties
 
-	public Jb2dJsonCustomProperties getCustomPropertiesForItem(Object item, boolean createIfNotExisting) {
+	public CustomProperties getCustomPropertiesForItem(Object item, boolean createIfNotExisting) {
 		
 		if (m_customPropertiesMap.containsKey(item))
 			return m_customPropertiesMap.get(item);
@@ -1443,7 +1424,7 @@ public class Jb2dJson {
 		if (!createIfNotExisting)
 			return null;
 
-		Jb2dJsonCustomProperties props = new Jb2dJsonCustomProperties();
+		CustomProperties props = new CustomProperties();
 		m_customPropertiesMap.put(item, props);
 
 		return props;
@@ -1607,7 +1588,7 @@ public class Jb2dJson {
 	// getCustomXXX
 
 	public int getCustomInt(Object item, String propertyName, int defaultVal) {
-		Jb2dJsonCustomProperties props = getCustomPropertiesForItem(item, false);
+		CustomProperties props = getCustomPropertiesForItem(item, false);
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_int.containsKey(propertyName))
@@ -1616,7 +1597,7 @@ public class Jb2dJson {
 	}
 
 	public float getCustomFloat(Object item, String propertyName, float defaultVal) {
-		Jb2dJsonCustomProperties props = getCustomPropertiesForItem(item, false);
+		CustomProperties props = getCustomPropertiesForItem(item, false);
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_float.containsKey(propertyName))
@@ -1625,7 +1606,7 @@ public class Jb2dJson {
 	}
 
 	public String getCustomString(Object item, String propertyName, String defaultVal) {
-		Jb2dJsonCustomProperties props = getCustomPropertiesForItem(item, false);
+		CustomProperties props = getCustomPropertiesForItem(item, false);
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_string.containsKey(propertyName))
@@ -1634,7 +1615,7 @@ public class Jb2dJson {
 	}
 
 	public Vector2 getCustomVector(Object item, String propertyName, Vector2 defaultVal) {
-		Jb2dJsonCustomProperties props = getCustomPropertiesForItem(item, false);
+		CustomProperties props = getCustomPropertiesForItem(item, false);
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_vec2.containsKey(propertyName))
@@ -1643,7 +1624,7 @@ public class Jb2dJson {
 	}
 
 	public boolean getCustomBool(Object item, String propertyName, boolean defaultVal) {
-		Jb2dJsonCustomProperties props = getCustomPropertiesForItem(item, false);
+		CustomProperties props = getCustomPropertiesForItem(item, false);
 		if (null == props)
 			return defaultVal;
 		if (props.m_customPropertyMap_bool.containsKey(propertyName))
@@ -2062,7 +2043,7 @@ public class Jb2dJson {
 	protected JSONArray writeCustomPropertiesToJson(Object item) throws JSONException {
 		JSONArray customPropertiesValue = new JSONArray();
 
-		Jb2dJsonCustomProperties props = getCustomPropertiesForItem(item, false);
+		CustomProperties props = getCustomPropertiesForItem(item, false);
 		if (null == props)
 			return customPropertiesValue;
 
