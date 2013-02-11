@@ -1426,8 +1426,8 @@ public class Loader {
 		return keys.toArray(new Image[0]);
 	}
 
-	public Image[] getAllImages() {
-		return (Image[]) m_images.toArray();
+	public Vector<Image> getAllImages() {
+		return m_images;
 	}
 
 	public Body getBodyByName(String name) {
