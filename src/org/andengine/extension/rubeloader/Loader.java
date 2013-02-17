@@ -1817,6 +1817,16 @@ public class Loader {
 		return items.size();
 	}
 
+	public int getFixturesByCustomString(String propertyName, Vector<Fixture> items) {
+		Iterator<Fixture> iterator = m_fixturesWithCustomProperties.iterator();
+		while (iterator.hasNext()) {
+			Fixture item = iterator.next();
+			if (hasCustomString(item, propertyName) && getCustomString( item, propertyName, new String() ).length() > 0)
+				items.add(item);
+		}
+		return items.size();
+	}
+
 	public int getFixturesByCustomVector(String propertyName, Vector2 valueToMatch, Vector<Fixture> items) {
 		Iterator<Fixture> iterator = m_fixturesWithCustomProperties.iterator();
 		while (iterator.hasNext()) {
