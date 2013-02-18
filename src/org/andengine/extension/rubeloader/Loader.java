@@ -792,6 +792,12 @@ public class Loader {
 		m_fixtureToNameMap.clear();
 		m_jointToNameMap.clear();
 		m_imageToNameMap.clear();
+
+		m_customPropertiesMap.clear();
+		m_bodiesWithCustomProperties.clear();
+		m_jointsWithCustomProperties.clear();
+		m_imagesWithCustomProperties.clear();
+		m_worldsWithCustomProperties.clear();
 	}
 
 	public PhysicsWorld readFromJSONObject(JSONObject worldValue) throws JSONException {
