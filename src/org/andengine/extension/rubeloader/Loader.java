@@ -795,6 +795,7 @@ public class Loader {
 
 		m_customPropertiesMap.clear();
 		m_bodiesWithCustomProperties.clear();
+		m_fixturesWithCustomProperties.clear();
 		m_jointsWithCustomProperties.clear();
 		m_imagesWithCustomProperties.clear();
 		m_worldsWithCustomProperties.clear();
