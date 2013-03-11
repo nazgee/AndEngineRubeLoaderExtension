@@ -44,8 +44,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -76,9 +74,11 @@ import com.badlogic.gdx.physics.box2d.joints.PulleyJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RopeJoint;
+import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WheelJoint;
+import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
 
 /**
  * 
@@ -1084,10 +1084,10 @@ public class Loader {
 		PulleyJointDef pulleyDef;
 		MouseJointDef mouseDef;
 		GearJointDef gearDef;
-		// WheelJointDef wheelDef;
+		WheelJointDef wheelDef;
 		WeldJointDef weldDef;
 		FrictionJointDef frictionDef;
-		// RopeJointDef ropeDef;
+		RopeJointDef ropeDef;
 
 		// will be used to select one of the above to work with
 		JointDef jointDef = null;
@@ -1145,39 +1145,22 @@ public class Loader {
 			mouseDef.maxForce = jsonToFloat("maxForce", jointValue);
 			mouseDef.frequencyHz = jsonToFloat("frequency", jointValue);
 			mouseDef.dampingRatio = jsonToFloat("dampingRatio", jointValue);
-		}
-		// Gear joints are apparently not implemented in JBox2D yet, but
-		// when they are, commenting out the following section should work.
-		/*
-		 * else if ( type.equals("gear") ) { jointDef = gearDef = new
-		 * GearJointDef(); int jointIndex1 = jointValue.getInt("joint1"); int
-		 * jointIndex2 = jointValue.getInt("joint2"); gearDef.joint1 =
-		 * m_joints.get(jointIndex1); gearDef.joint2 =
-		 * m_joints.get(jointIndex2); gearDef.ratio = jsonToFloat("ratio",
-		 * jointValue); }
-		 */
-		// Wheel joints are apparently not implemented in JBox2D yet, but
-		// when they are, commenting out the following section should work.
-		/*
-		 * else if ( type.equals("wheel") ) { jointDef = wheelDef = new
-		 * WheelJointDef(); wheelDef.localAnchorA.set( jsonToVec("anchorA",
-		 * jointValue) ); wheelDef.localAnchorB.set( jsonToVec("anchorB",
-		 * jointValue) ); wheelDef.localAxisA.set( jsonToVec("localAxisA",
-		 * jointValue) ); wheelDef.enableMotor =
-		 * jointValue.optBoolean("enableMotor",false); wheelDef.motorSpeed =
-		 * jsonToFloat("motorSpeed", jointValue); wheelDef.maxMotorTorque =
-		 * jsonToFloat("maxMotorTorque", jointValue); wheelDef.frequencyHz =
-		 * jsonToFloat("springFrequency", jointValue); wheelDef.dampingRatio =
-		 * jsonToFloat("springDampingRatio", jointValue); }
-		 */
-		// For now, we will make do with a revolute joint.
-		else if (type.equals("wheel")) {
-			jointDef = revoluteDef = new RevoluteJointDef();
-			revoluteDef.localAnchorA.set(jsonToVec("anchorA", jointValue));
-			revoluteDef.localAnchorB.set(jsonToVec("anchorB", jointValue));
-			revoluteDef.enableMotor = jointValue.optBoolean("enableMotor", false);
-			revoluteDef.motorSpeed = jsonToFloat("motorSpeed", jointValue);
-			revoluteDef.maxMotorTorque = jsonToFloat("maxMotorTorque", jointValue);
+		} else if ( type.equals("gear") ) { jointDef = gearDef = new
+			GearJointDef(); int jointIndex1 = jointValue.getInt("joint1");
+			int jointIndex2 = jointValue.getInt("joint2"); 
+			gearDef.joint1 = m_joints.get(jointIndex1);
+			gearDef.joint2 = m_joints.get(jointIndex2);
+			gearDef.ratio = jsonToFloat("ratio", jointValue);
+		} else if ( type.equals("wheel") ) {
+			jointDef = wheelDef = new WheelJointDef();
+			wheelDef.localAnchorA.set( jsonToVec("anchorA", jointValue) );
+			wheelDef.localAnchorB.set( jsonToVec("anchorB", jointValue) );
+			wheelDef.localAxisA.set( jsonToVec("localAxisA", jointValue) );
+			wheelDef.enableMotor = jointValue.optBoolean("enableMotor",false);
+			wheelDef.motorSpeed = jsonToFloat("motorSpeed", jointValue);
+			wheelDef.maxMotorTorque = jsonToFloat("maxMotorTorque", jointValue);
+			wheelDef.frequencyHz = jsonToFloat("springFrequency", jointValue);
+			wheelDef.dampingRatio = jsonToFloat("springDampingRatio", jointValue);
 		} else if (type.equals("weld")) {
 			jointDef = weldDef = new WeldJointDef();
 			weldDef.localAnchorA.set(jsonToVec("anchorA", jointValue));
@@ -1190,15 +1173,12 @@ public class Loader {
 			frictionDef.maxForce = jsonToFloat("maxForce", jointValue);
 			frictionDef.maxTorque = jsonToFloat("maxTorque", jointValue);
 		}
-		// Rope joints are apparently not implemented in JBox2D yet, but
-		// when they are, commenting out the following section should work.
-		/*
-		 * else if ( type.equals("rope") ) { jointDef = ropeDef = new
-		 * RopeJointDef(); ropeDef.localAnchorA.set( jsonToVec("anchorA",
-		 * jointValue) ); ropeDef.localAnchorB.set( jsonToVec("anchorB",
-		 * jointValue) ); ropeDef.maxLength = jsonToFloat("maxLength",
-		 * jointValue); }
-		 */
+		else if ( type.equals("rope") ) { 
+			jointDef = ropeDef = new RopeJointDef();
+			ropeDef.localAnchorA.set( jsonToVec("anchorA", jointValue) );
+			ropeDef.localAnchorB.set( jsonToVec("anchorB", jointValue) );
+			ropeDef.maxLength = jsonToFloat("maxLength", jointValue); 
+		}
 
 		if (null != jointDef) {
 			// set features common to all joints
