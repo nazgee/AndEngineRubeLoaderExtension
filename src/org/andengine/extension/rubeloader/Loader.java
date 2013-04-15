@@ -108,7 +108,7 @@ public class Loader {
 	// This maps an item (Body, Fixture etc) to a set of custom properties.
 	// Use null for world properties.
 	protected Map<Object, CustomProperties> m_customPropertiesMap;
-	
+
 	protected Set<Body> m_bodiesWithCustomProperties;
 	protected Set<Fixture> m_fixturesWithCustomProperties;
 	protected Set<Joint> m_jointsWithCustomProperties;
@@ -818,6 +818,17 @@ public class Loader {
 		}
 	}
 
+	public PhysicsWorld continueReadingFromString(String str, StringBuilder errorMsg, PhysicsWorld pWorld) {
+		try {
+			JSONObject worldValue = new JSONObject(str);
+			return j2b2PhysicsWorld(worldValue, pWorld);
+		} catch (JSONException e) {
+			errorMsg.append("Failed to parse JSON");
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	public PhysicsWorld readFromFile(String filename, StringBuilder errorMsg) {
 		if (null == filename)
 			return null;
@@ -876,6 +887,11 @@ public class Loader {
 		// world.setSubStepping( worldValue.getBoolean("subStepping") );
 
 		readCustomPropertiesFromJson(world, worldValue);
+
+		return j2b2PhysicsWorld(worldValue, world);
+	}
+
+	private PhysicsWorld j2b2PhysicsWorld(JSONObject worldValue, PhysicsWorld world) throws JSONException {
 
 		int i = 0;
 		JSONArray bodyValues = worldValue.optJSONArray("body");
