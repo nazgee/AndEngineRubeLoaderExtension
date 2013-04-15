@@ -849,12 +849,26 @@ public class Loader {
 		}
 	}
 
+	/**
+	 * Can be overriden to instantianate custom world
+	 * @param pGravity
+	 * @param sim_positionIterations
+	 * @param sim_velocityIterations
+	 * @param sim_allowSleep
+	 * @return
+	 * @throws JSONException
+	 */
+	protected PhysicsWorld createWorld(final Vector2 pGravity, int sim_positionIterations, int sim_velocityIterations, boolean sim_allowSleep)
+			throws JSONException {
+		return new PhysicsWorld(pGravity, sim_allowSleep, sim_positionIterations, sim_velocityIterations);
+	}
+
 	public PhysicsWorld j2b2PhysicsWorld(JSONObject worldValue) throws JSONException {
 		int sim_positionIterations = worldValue.getInt("positionIterations");
 		int sim_velocityIterations = worldValue.getInt("velocityIterations");
 		boolean sim_allowSleep = worldValue.getBoolean("allowSleep");
 
-		PhysicsWorld world = new PhysicsWorld(jsonToVec("gravity", worldValue), sim_allowSleep, sim_positionIterations, sim_velocityIterations);
+		PhysicsWorld world = createWorld(jsonToVec("gravity", worldValue), sim_positionIterations, sim_velocityIterations, sim_allowSleep);
 
 		world.setAutoClearForces(worldValue.getBoolean("autoClearForces"));
 		world.setWarmStarting(worldValue.getBoolean("warmStarting"));
