@@ -850,14 +850,7 @@ public class Loader {
 			return null;
 		}
 
-		try {
-			JSONObject worldValue = new JSONObject(str);
-			return j2b2PhysicsWorld(worldValue);
-		} catch (JSONException e) {
-			errorMsg.append("\nFailed to parse JSON: " + filename);
-			e.printStackTrace();
-			return null;
-		}
+		return readFromString(str, errorMsg);
 	}
 
 	/**
