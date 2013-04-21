@@ -1,10 +1,7 @@
 package org.andengine.extension.rubeloader;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Vector;
 
 import org.andengine.entity.Entity;
@@ -17,6 +14,8 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.StreamUtils;
+import org.andengine.util.adt.io.in.ResourceInputStreamOpener;
 import org.andengine.util.math.MathUtils;
 
 import android.content.res.Resources;
@@ -95,7 +94,7 @@ public class SimpleLoader extends Loader {
 	public PhysicsWorld load(Resources pResources, Scene pScene, ITextureProvider pTextureProvider, VertexBufferObjectManager pVBOM,  int resId, final int ... pExtraResId) {
 
 		StringBuilder errorMsg = new StringBuilder();
-		PhysicsWorld world = readFromString(readRawTextFile(resId, pResources), errorMsg);
+		PhysicsWorld world = readFromString(readResource(resId, pResources), errorMsg);
 
 		for (int i = 0; i < pExtraResId.length; i++) {
 			overload(pResources, errorMsg, world, pExtraResId[i]);
@@ -146,27 +145,17 @@ public class SimpleLoader extends Loader {
 
 	private void overload(Resources pResources, StringBuilder errorMsg, PhysicsWorld world, int pResourceId) {
 		sHelperLoader.clear();
-		sHelperLoader.continueReadingFromString(readRawTextFile(pResourceId, pResources), errorMsg, world);
+		sHelperLoader.continueReadingFromString(readResource(pResourceId, pResources), errorMsg, world);
 		mergeWithOtherLoader(sHelperLoader);
 	}
 
-	private String readRawTextFile(int resId, Resources pResources) {
-		InputStream inputStream = pResources.openRawResource(resId);
-
-		InputStreamReader inputreader = new InputStreamReader(inputStream);
-		BufferedReader buffreader = new BufferedReader(inputreader);
-		String line;
-		StringBuilder text = new StringBuilder();
-
+	private String readResource(int resId, Resources pResources) {
 		try {
-			while ((line = buffreader.readLine()) != null) {
-				text.append(line);
-			}
-		} catch (IOException e) {
+			return StreamUtils.readFully(new ResourceInputStreamOpener(pResources, resId).open());
+		} catch (IOException e1) {
+			e1.printStackTrace();
 			return null;
 		}
-
-		return text.toString();
 	}
 	// ===========================================================
 	// Inner and Anonymous Classes
