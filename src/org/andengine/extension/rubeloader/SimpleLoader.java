@@ -149,7 +149,7 @@ public class SimpleLoader extends Loader {
 		mergeWithOtherLoader(sHelperLoader);
 	}
 
-	private String readResource(int resId, Resources pResources) {
+	public static String readResource(int resId, Resources pResources) {
 		try {
 			return StreamUtils.readFully(new ResourceInputStreamOpener(pResources, resId).open());
 		} catch (IOException e1) {
