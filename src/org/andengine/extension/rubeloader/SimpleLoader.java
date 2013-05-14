@@ -6,7 +6,6 @@ import java.util.Vector;
 
 import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.sprite.UncoloredSprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
@@ -48,7 +47,7 @@ public class SimpleLoader extends Loader {
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
-	protected void handleImage(Scene pScene, VertexBufferObjectManager pVBOM, PhysicsWorld world, Image image, final ITextureRegion region,
+	protected void handleImage(IEntity pScene, VertexBufferObjectManager pVBOM, PhysicsWorld world, Image image, final ITextureRegion region,
 			final float w, final float h, final float x, final float y) {
 		Sprite sprite = populateSprite(region, pVBOM, (int)image.renderOrder, image.angle, w, h, x, y);
 
@@ -91,7 +90,7 @@ public class SimpleLoader extends Loader {
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	public PhysicsWorld load(Resources pResources, Scene pScene, ITextureProvider pTextureProvider, VertexBufferObjectManager pVBOM,  int resId, final int ... pExtraResId) {
+	public PhysicsWorld load(Resources pResources, IEntity pScene, ITextureProvider pTextureProvider, VertexBufferObjectManager pVBOM,  int resId, final int ... pExtraResId) {
 
 		StringBuilder errorMsg = new StringBuilder();
 		PhysicsWorld world = readFromString(readResource(resId, pResources), errorMsg);
