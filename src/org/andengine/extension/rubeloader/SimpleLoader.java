@@ -47,23 +47,28 @@ public class SimpleLoader extends Loader {
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
-	protected void handleImage(IEntity pScene, VertexBufferObjectManager pVBOM, PhysicsWorld world, Image image, final ITextureRegion region,
+	public IEntity loadImage(IEntity pSceneEntity, VertexBufferObjectManager pVBOM, PhysicsWorld world, Image image, final ITextureRegion region,
 			final float w, final float h, final float x, final float y) {
 		Sprite sprite = populateSprite(region, pVBOM, (int)image.renderOrder, image.angle, w, h, x, y);
 
 		if (image.body != null) {
+			// XXX this has to be eventually fixed! we should use regular sprites
+			// not nested in proxy-entities!
 			IEntity entity = prepareForPhysics(x, y, sprite);
 
 			PhysicsConnector connector = populatePhysicsConnector(image.body, entity);
 			image.body.setUserData(connector);
 			world.registerPhysicsConnector(connector);
 
-			pScene.attachChild(entity);
+			pSceneEntity.attachChild(entity);
 		} else {
-			pScene.attachChild(sprite);
+			pSceneEntity.attachChild(sprite);
 		}
+
+		return sprite;
 	}
 
+	// XXX this method has to go... we do not want proxies!
 	protected IEntity prepareForPhysics(final float pX, final float pY, Sprite pSprite) {
 		Entity entity = new Entity(pX, pY);
 		entity.attachChild(pSprite);
@@ -90,7 +95,7 @@ public class SimpleLoader extends Loader {
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	public PhysicsWorld load(Resources pResources, IEntity pScene, ITextureProvider pTextureProvider, VertexBufferObjectManager pVBOM,  int resId, final int ... pExtraResId) {
+	public PhysicsWorld load(Resources pResources, IEntity pSceneEntity, ITextureProvider pTextureProvider, VertexBufferObjectManager pVBOM,  int resId, final int ... pExtraResId) {
 
 		StringBuilder errorMsg = new StringBuilder();
 		PhysicsWorld world = readFromString(readResource(resId, pResources), errorMsg);
@@ -109,7 +114,7 @@ public class SimpleLoader extends Loader {
 			final float x = image.center.x * p2m;
 			final float y = image.center.y * p2m;
 
-			handleImage(pScene, pVBOM, world, image, region, w, h, x, y);
+			loadImage(pSceneEntity, pVBOM, world, image, region, w, h, x, y);
 		}
 
 		return world;
