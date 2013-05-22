@@ -47,7 +47,7 @@ public class SimpleLoader extends Loader {
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
-	public IEntity loadImage(IEntity pSceneEntity, VertexBufferObjectManager pVBOM, PhysicsWorld world, Image image, final ITextureRegion region,
+	protected IEntity loadImage(IEntity pSceneEntity, VertexBufferObjectManager pVBOM, PhysicsWorld world, Image image, final ITextureRegion region,
 			final float w, final float h, final float x, final float y) {
 		Sprite sprite = populateSprite(region, pVBOM, (int)image.renderOrder, image.angle, w, h, x, y);
 
