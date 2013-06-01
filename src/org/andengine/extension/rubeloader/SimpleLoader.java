@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.sprite.UncoloredSprite;
@@ -52,8 +51,6 @@ public class SimpleLoader extends Loader {
 		Sprite sprite = populateSprite(region, pVBOM, (int)image.renderOrder, image.angle, w, h, x, y);
 
 		if (image.body != null) {
-			// XXX this has to be eventually fixed! we should use regular sprites
-			// not nested in proxy-entities!
 			IEntity entity = prepareForPhysics(x, y, sprite);
 
 			PhysicsConnector connector = populatePhysicsConnector(image.body, entity);
@@ -68,20 +65,24 @@ public class SimpleLoader extends Loader {
 		return sprite;
 	}
 
-	// XXX this method has to go... we do not want proxies!
 	protected IEntity prepareForPhysics(final float pX, final float pY, Sprite pSprite) {
-		Entity entity = new Entity(pX, pY);
-		entity.attachChild(pSprite);
-		pSprite.setPosition(pX, pY);
-		return entity;
+		final float w = pSprite.getWidth();
+		final float h = pSprite.getHeight();
+		pSprite.setAnchorCenter(-pX / w + 0.5f, -pY / h + 0.5f);
+		return pSprite;
 	}
 
 	protected Sprite populateSprite(final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pAngle, final float pWidth,
 			final float pHeight, final float pX, final float pY) {
-		Sprite sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM);
+		Sprite sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM) {
+			final float mRotationOffset = MathUtils.radToDeg(-pAngle);
+			@Override
+			public void setRotation(float pRotation) {
+				super.setRotation(pRotation + mRotationOffset);
+			}
+		};
 		sprite.setCullingEnabled(true);
 		sprite.setZIndex(pZindex);
-		sprite.setRotation(MathUtils.radToDeg(-pAngle));
 		return sprite;
 	}
 
