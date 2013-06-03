@@ -24,7 +24,7 @@ import com.badlogic.gdx.physics.box2d.Body;
  * Simple example of a customr R.U.B.E. loader
  * @author Michal Stawinski (nazgee)
  */
-public class SimpleLoader extends Loader {
+public class SimpleOldLoader extends OldLoader {
 
 	// ===========================================================
 	// Constants
@@ -33,11 +33,11 @@ public class SimpleLoader extends Loader {
 	// ===========================================================
 	// Fields
 	// ===========================================================
-	private final static SimpleLoader sHelperLoader = new SimpleLoader();
+	private final static SimpleOldLoader sHelperLoader = new SimpleOldLoader();
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-	public SimpleLoader() {
+	public SimpleOldLoader() {
 	}
 	// ===========================================================
 	// Getter & Setter
@@ -121,7 +121,7 @@ public class SimpleLoader extends Loader {
 		return world;
 	}
 
-	private void mergeWithOtherLoader(SimpleLoader pLoader) {
+	private void mergeWithOtherLoader(SimpleOldLoader pLoader) {
 		{
 			int i = 0;
 			int newBodies = pLoader.m_bodies.size();

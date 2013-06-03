@@ -25,6 +25,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 Ported to AndEngine: Bart Hirst - http://www.linkedin.com/in/louisbhirst
 */
 
+import com.badlogic.gdx.physics.box2d.Body;
 
 /**
  * 

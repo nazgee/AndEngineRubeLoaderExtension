@@ -1,0 +1,169 @@
+package org.andengine.extension.rubeloader.parser;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import net.minidev.json.parser.ParseException;
+
+import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.extension.rubeloader.def.ImageDef;
+import org.andengine.extension.rubeloader.def.RubeDef;
+import org.andengine.extension.rubeloader.def.WorldDef;
+import org.andengine.extension.rubeloader.json.AutocastMap;
+import org.andengine.extension.rubeloader.parser.AdapterListToParser.IInflatingListener;
+
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Joint;
+import com.badlogic.gdx.physics.box2d.JointDef;
+
+
+public class RubeParser extends ParserDef<RubeDef> {
+
+	ParserWorldDef mParserWorldDef = new ParserWorldDef();
+	ParserBodyDef mParserBodyDef = new ParserBodyDef();
+	ParserFixtureDef mParserFixtureDef = new ParserFixtureDef();
+	ParserJointDef mParserJointDef = new ParserJointDef();
+	ParserImageDef mParserImageDef = new ParserImageDef();
+
+	AdapterListToParserDef<BodyDef> mParserBodies = new AdapterListToParserDef<BodyDef>("body", mParserBodyDef);
+	AdapterListToParserDef<FixtureDef> mParserFixtures = new AdapterListToParserDef<FixtureDef>("fixture", mParserFixtureDef);
+	AdapterListToParserDef<JointDef> mParserJoints = new AdapterListToParserDef<JointDef>("joint", mParserJointDef);
+	AdapterListToParserDef<ImageDef> mParserImages = new AdapterListToParserDef<ImageDef>("image", mParserImageDef);
+
+	@Override
+	protected RubeDef doParse(AutocastMap pMap) {
+		return doParse(new RubeDef(), pMap);
+	}
+
+	public RubeDef continueParse(PhysicsWorld pWorld, String pStringToParse) throws ParseException {
+		AutocastMap map = loadMapFromString(pStringToParse);
+		return doParse(new RubeDef(pWorld), map);
+	}
+
+	protected RubeDef doParse(RubeDef rubeDef, AutocastMap pMap) {
+
+		mParserBodies.setParsingListener(new BasicListener<BodyDef>());
+		mParserFixtures.setParsingListener(new BasicListener<FixtureDef>());
+		mParserJoints.setParsingListener(new BasicListener<JointDef>());
+		mParserImages.setParsingListener(new BasicListener<ImageDef>());
+
+		if (rubeDef.world == null) {
+			WorldDef worldDef = mParserWorldDef.parse(pMap);
+			rubeDef.world = mParserWorldDef.createWorld(worldDef);
+		}
+		mParserBodies.parse(pMap);
+		mParserJoints.parse(pMap);
+		mParserImages.parse(pMap);
+
+		List<BodyDef> bodydefs = mParserBodies.getInflatedResult();
+		List<AutocastMap> bodymaps = mParserBodies.getInflatedMapsList();
+		List<ArrayList<AutocastMap>> bodycustoms = mParserBodies.getInflatedCustomPropertiesList();
+		List<JointDef> jointdefs = mParserJoints.getInflatedResult();
+		List<AutocastMap> jointmaps = mParserJoints.getInflatedMapsList();
+		List<ArrayList<AutocastMap>> jointcustoms = mParserJoints.getInflatedCustomPropertiesList();
+		List<ImageDef> imagedefs = mParserImages.getInflatedResult();
+		List<AutocastMap> imagemaps = mParserImages.getInflatedMapsList();
+		List<ArrayList<AutocastMap>> imagecustoms = mParserImages.getInflatedCustomPropertiesList();
+
+		int bodycount = (bodydefs != null) ? bodydefs.size() : 0;
+		int jointcount = (jointdefs != null) ? jointdefs.size() : 0;
+		int imagecount = (imagedefs != null) ? imagedefs.size() : 0;
+
+		rubeDef.primitives.assureCapacities(bodycount, jointcount, imagecount);
+
+		Vector<Body> bodies = rubeDef.primitives.bodies;
+		Vector<Joint> joints = rubeDef.primitives.joints;
+		Vector<ImageDef> images = rubeDef.primitives.images;
+
+		/* bodies */
+		for (int i = 0; i < bodycount; i++) {
+			Body b = mParserBodyDef.createBody(rubeDef.world, bodydefs.get(i), bodymaps.get(i));
+			rubeDef.registerBody(b, i, bodymaps.get(i).getString("name", ""));
+
+			installCustomProps(rubeDef, b, bodycustoms.get(i));
+
+			/* fixtures */
+			mParserFixtures.parse(bodymaps.get(i));
+			List<FixtureDef> fixturedefs = mParserFixtures.getInflatedResult();
+			List<AutocastMap> fixturemaps = mParserFixtures.getInflatedMapsList();
+			List<ArrayList<AutocastMap>> fixturecustoms = mParserFixtures.getInflatedCustomPropertiesList();
+			int fixturecount = (fixturedefs != null) ? fixturedefs.size() : 0;
+			for (int j = 0; j < fixturecount; j++) {
+				Fixture f = mParserFixtureDef.createFixture(fixturedefs.get(j), b);
+				rubeDef.registerFixture(f, fixturemaps.get(j).getString("name", ""));
+
+				installCustomProps(rubeDef, f, fixturecustoms.get(j));
+			}
+		}
+
+		/* joints - regular joints go first */
+		for (int i = 0; i < jointcount; i++) {
+			Joint j = mParserJointDef.createJoint(rubeDef.world, bodies, jointdefs.get(i), jointmaps.get(i));
+			rubeDef.registerJoint(j, i, jointmaps.get(i).getString("name", ""));
+		}
+		/* joints - gearjoints go second (each gearjoint references two instances of regular joints) */
+		for (int i = 0; i < jointcount; i++) {
+			Joint j = mParserJointDef.createGearJoint(rubeDef.world, bodies, joints, jointdefs.get(i), jointmaps.get(i));
+			rubeDef.registerJoint(j, i, jointmaps.get(i).getString("name", ""));
+
+			installCustomProps(rubeDef, joints.get(i), jointcustoms.get(i));
+		}
+
+		/* images - not created here (let's say we want to handle physics only, and leave graphics to the user) */
+		for (int i = 0; i < imagecount; i++) {
+			mParserImageDef.bindWithBody(imagedefs.get(i), imagemaps.get(i), bodies);
+			rubeDef.registerImage(imagedefs.get(i), i, imagemaps.get(i).getString("name", ""));
+
+			installCustomProps(rubeDef, images.get(i), imagecustoms.get(i));
+		}
+
+		return rubeDef;
+	}
+
+	protected PhysicsWorld createWorld(final Vector2 pGravity, int sim_positionIterations, int sim_velocityIterations, boolean sim_allowSleep) {
+		return new PhysicsWorld(pGravity, sim_allowSleep, sim_positionIterations, sim_velocityIterations);
+	}
+
+	private static class BasicListener<T> implements IInflatingListener<T> {
+		@Override
+		public void onParsed(AdapterListToParser<T> parser, T result, AutocastMap map) {
+			//System.out.println("parsed " + result + " from " + map);
+		}
+
+		@Override
+		public void onParsingStarted(AdapterListToParser<T> parser) {
+			//System.out.println("========== parsing " + parser.getKeyToInflate() + "... ==========");
+		}
+
+		@Override
+		public void onParsingFinished(AdapterListToParser<T> parser) {
+			//System.out.println("========== ... parsing " + parser.getKeyToInflate() + " ==========");
+		}
+	}
+
+	private void installCustomProps(RubeDef pRube, Object item, List<AutocastMap> pMap) {
+		if (pMap != null) {
+			int customcount = pMap.size();
+			for (int i = 0; i < customcount; i++) {
+				AutocastMap propValue = pMap.get(i);
+				String propertyName = propValue.getString("name");
+				if (propValue.has("int")) {
+					pRube.setCustomInt(item, propertyName, propValue.getInt("int"));
+				} else if (propValue.has("float")) {
+					pRube.setCustomFloat(item, propertyName, (float) propValue.getFloat("float"));
+				} else if (propValue.has("string")) {
+					pRube.setCustomString(item, propertyName, propValue.getString("string"));
+				} else if (propValue.has("vec2")) {
+					pRube.setCustomVector(item, propertyName, propValue.getVector2("vec2"));
+				} else if (propValue.has("bool")) {
+					pRube.setCustomBool(item, propertyName, propValue.getBool("bool"));
+				}
+			}
+		}
+	}
+}
