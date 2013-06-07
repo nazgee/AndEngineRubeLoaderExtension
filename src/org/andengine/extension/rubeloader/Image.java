@@ -1,5 +1,8 @@
 package org.andengine.extension.rubeloader;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+
 /*
  Author: Chris Campbell - www.iforce2d.net
 
@@ -22,8 +25,6 @@ package org.andengine.extension.rubeloader;
 Ported to AndEngine: Bart Hirst - http://www.linkedin.com/in/louisbhirst
 */
 
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.math.Vector2;
 
 /**
  * 
