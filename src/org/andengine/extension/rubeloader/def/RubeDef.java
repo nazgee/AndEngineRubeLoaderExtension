@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.extension.rubeloader.Image;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;

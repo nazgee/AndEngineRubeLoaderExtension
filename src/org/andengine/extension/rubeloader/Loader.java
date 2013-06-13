@@ -56,7 +56,7 @@ public class Loader {
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
 
-	protected void loadImages(IEntity pSceneEntity, ITextureProvider pTextureProvider, VertexBufferObjectManager pVBOM, RubeDef pRubeDef) {
+	protected void handleImages(VertexBufferObjectManager pVBOM, IEntity pSceneEntity, ITextureProvider pTextureProvider, RubeDef pRubeDef) {
 		Vector<ImageDef> imgs = pRubeDef.primitives.images;
 		for (ImageDef image : imgs) {
 			final float p2m = getPixelToMeterRatio(image);
@@ -67,46 +67,43 @@ public class Loader {
 			final float x = image.center.x * p2m;
 			final float y = image.center.y * p2m;
 
-			IEntity entity = loadImage(pSceneEntity, pVBOM, pRubeDef, image, region, w, h, x, y);
-
-			if (entity != null) {
-				pSceneEntity.attachChild(entity);
-			}
+			handleImage(x, y, w, h, region, pVBOM, pSceneEntity, pTextureProvider, pRubeDef, image);
 		}
 	}
 
-	protected IEntity loadImage(IEntity pSceneEntity, VertexBufferObjectManager pVBOM, RubeDef pRube, ImageDef image, final ITextureRegion region,
-			final float w, final float h, final float x, final float y) {
-		Sprite sprite = populateSprite(region, pVBOM, (int)image.renderOrder, image.angle, w, h, x, y);
+	protected void handleImage(float x, float y, float w, float h, ITextureRegion region, VertexBufferObjectManager pVBOM, IEntity pSceneEntity, ITextureProvider pTextureProvider, RubeDef pRubeDef, ImageDef pImageDef) {
+		IEntity entity = populateEntity(x, y, w, h, region, pVBOM, (int)pImageDef.renderOrder, pImageDef.angle);
 
-		if (image.body != null) {
-			sprite.setAnchorCenter(-x / sprite.getWidth() + 0.5f, -y / sprite.getHeight() + 0.5f);
+		if (entity != null) {
+			if (pImageDef.body != null) {
 
-			PhysicsConnector connector = populatePhysicsConnector(pRube, image.body, sprite);
-			image.body.setUserData(connector);
-			sprite.setUserData(connector);
-			pRube.world.registerPhysicsConnector(connector);
+				PhysicsConnector connector = populatePhysicsConnector(pRubeDef, pImageDef.body, entity);
+				pImageDef.body.setUserData(connector);
+				entity.setUserData(connector);
+				pRubeDef.world.registerPhysicsConnector(connector);
+			}
+
+			pSceneEntity.attachChild(entity);
 		}
-
-		return sprite;
 	}
 
 	/**
-	 * Create sprite which will handle
+	 * 
+	 * @param pX
+	 * @param pY
+	 * @param pWidth
+	 * @param pHeight
 	 * @param region
 	 * @param pVBOM
 	 * @param pZindex
 	 * @param pAngle
-	 * @param pWidth
-	 * @param pHeight
-	 * @param pX
-	 * @param pY
 	 * @return
 	 */
-	protected Sprite populateSprite(final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pAngle, final float pWidth,
-			final float pHeight, final float pX, final float pY) {
+	protected Sprite populateEntity(final float pX, final float pY, final float pWidth, final float pHeight, final ITextureRegion region,
+			VertexBufferObjectManager pVBOM, final int pZindex, final float pAngle) {
 		Sprite sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM);
 		sprite.setRotationOffset(MathUtils.radToDeg(-pAngle));
+		sprite.setAnchorCenter(-pX / pWidth + 0.5f, -pY / pHeight + 0.5f);
 		sprite.setCullingEnabled(true);
 		sprite.setZIndex(pZindex);
 		return sprite;
@@ -131,7 +128,7 @@ public class Loader {
 		} catch (ParseException e) {
 			throw new RuntimeException("RUBE json parsing failed! ", e);
 		}
-		loadImages(pSceneEntity, pTextureProvider, pVBOM, rube);
+		handleImages(pVBOM, pSceneEntity, pTextureProvider, rube);
 
 		long elapseTime = System.currentTimeMillis() - startTime;
 		Debug.w("RubeLoaderExtension LOAD_TIME=" + elapseTime/1000.f);
@@ -148,7 +145,7 @@ public class Loader {
 		} catch (ParseException e) {
 			throw new RuntimeException("RUBE json parsing failed! ", e);
 		}
-		loadImages(pSceneEntity, pTextureProvider, pVBOM, rube);
+		handleImages(pVBOM, pSceneEntity, pTextureProvider, rube);
 
 		long elapseTime = System.currentTimeMillis() - startTime;
 		Debug.w("RubeLoaderExtension LOAD_TIME=" + elapseTime/1000.f);

@@ -1,12 +1,8 @@
 package org.andengine.extension.rubeloader.parser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.andengine.extension.rubeloader.json.AutocastMap;
-
-
-
 
 public class AdapterListToParserDef<T> extends AdapterListToParser<T> {
 	private final ArrayList<ArrayList<AutocastMap>> mInflatedCustomProperties = new ArrayList<ArrayList<AutocastMap>>();

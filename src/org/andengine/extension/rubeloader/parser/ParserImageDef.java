@@ -6,7 +6,6 @@ import org.andengine.extension.rubeloader.def.ImageDef;
 import org.andengine.extension.rubeloader.json.AutocastMap;
 
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Fixture;
 
 
 public class ParserImageDef extends ParserDef<ImageDef> {
