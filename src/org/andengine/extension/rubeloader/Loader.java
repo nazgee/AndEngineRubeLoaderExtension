@@ -10,10 +10,10 @@ import org.andengine.entity.IEntity;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.sprite.UncoloredSprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
-import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.andengine.extension.rubeloader.def.ImageDef;
 import org.andengine.extension.rubeloader.def.RubeDef;
+import org.andengine.extension.rubeloader.factory.IPhysicsWorldProvider;
 import org.andengine.extension.rubeloader.parser.RubeParser;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
@@ -81,7 +81,7 @@ public class Loader {
 				PhysicsConnector connector = populatePhysicsConnector(pRubeDef, pImageDef.body, entity);
 				pImageDef.body.setUserData(connector);
 				entity.setUserData(connector);
-				pRubeDef.world.registerPhysicsConnector(connector);
+				pRubeDef.worldProvider.getWorld().registerPhysicsConnector(connector);
 			}
 
 			pSceneEntity.attachChild(entity);
@@ -119,12 +119,12 @@ public class Loader {
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	public RubeDef loadMoreToExistingWorld(final Resources pResources, final IEntity pSceneEntity, final ITextureProvider pTextureProvider, final VertexBufferObjectManager pVBOM, int resId, final PhysicsWorld pWorld) {
+	public RubeDef loadMoreToExistingWorld(final Resources pResources, final IEntity pSceneEntity, final ITextureProvider pTextureProvider, final VertexBufferObjectManager pVBOM, int resId, final IPhysicsWorldProvider pPhysicsWorldProvider) {
 		long startTime = System.currentTimeMillis();
 
 		RubeDef rube;
 		try {
-			rube = mRubeParser.continueParse(pWorld, readResource(resId, pResources));
+			rube = mRubeParser.continueParse(pPhysicsWorldProvider, readResource(resId, pResources));
 		} catch (ParseException e) {
 			throw new RuntimeException("RUBE json parsing failed! ", e);
 		}

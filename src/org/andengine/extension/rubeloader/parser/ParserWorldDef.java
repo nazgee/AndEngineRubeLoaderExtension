@@ -1,6 +1,5 @@
 package org.andengine.extension.rubeloader.parser;
 
-import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.rubeloader.def.WorldDef;
 import org.andengine.extension.rubeloader.json.AutocastMap;
 
@@ -20,14 +19,5 @@ public class ParserWorldDef extends ParserDef<WorldDef> {
 		world.gravity = pMap.getVector2("gravity");
 
 		return world;
-	}
-
-	// XXX factory?
-	public PhysicsWorld createWorld(final WorldDef pWorldDef) {
-		PhysicsWorld ret = new PhysicsWorld(pWorldDef.gravity, pWorldDef.allowSleep, pWorldDef.positionIterations, pWorldDef.velocityIterations);
-		ret.setAutoClearForces(pWorldDef.autoClearForces);
-		ret.setWarmStarting(pWorldDef.warmStarting);
-		ret.setContinuousPhysics(pWorldDef.continuousPhysics);
-		return ret;
 	}
 }

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.extension.rubeloader.factory.IPhysicsWorldProvider;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -16,7 +17,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Joint;
 
 public class RubeDef {
-	public PhysicsWorld world;
+	public IPhysicsWorldProvider worldProvider;
 
 	public RubeDefDataPrimitivesList primitives = new RubeDefDataPrimitivesList();
 	public RubeDefDataIndexesMap indexes = new RubeDefDataIndexesMap();
@@ -31,8 +32,12 @@ public class RubeDef {
 		this(null);
 	}
 
-	public RubeDef(PhysicsWorld pWorld) {
-		world = pWorld;
+	/**
+	 * Use this constructor to have multiple RUBE files loaded into single PhysicsWorld
+	 * @param pWorld - instance of {@link PhysicsWorld} to be reused when loading data from RUBE file
+	 */
+	public RubeDef(IPhysicsWorldProvider pPhysicsWorldProvider) {
+		worldProvider = pPhysicsWorldProvider;
 	}
 
 	public class RubeDefDataCustomProperties {

@@ -9,7 +9,16 @@ import net.minidev.json.parser.ParseException;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.rubeloader.def.ImageDef;
 import org.andengine.extension.rubeloader.def.RubeDef;
-import org.andengine.extension.rubeloader.def.WorldDef;
+import org.andengine.extension.rubeloader.factory.BodyFactory;
+import org.andengine.extension.rubeloader.factory.FixtureFactory;
+import org.andengine.extension.rubeloader.factory.IBodyFactory;
+import org.andengine.extension.rubeloader.factory.IFixtureFactory;
+import org.andengine.extension.rubeloader.factory.IJointsFactory;
+import org.andengine.extension.rubeloader.factory.IPhysicsWorldFactory;
+import org.andengine.extension.rubeloader.factory.IPhysicsWorldProvider;
+import org.andengine.extension.rubeloader.factory.JointsFactory;
+import org.andengine.extension.rubeloader.factory.PhysicsWorldFactory;
+import org.andengine.extension.rubeloader.factory.PhysicsWorldProvider;
 import org.andengine.extension.rubeloader.json.AutocastMap;
 import org.andengine.extension.rubeloader.parser.AdapterListToParser.IInflatingListener;
 
@@ -24,7 +33,6 @@ import com.badlogic.gdx.physics.box2d.JointDef;
 
 public class RubeParser extends ParserDef<RubeDef> {
 
-	ParserWorldDef mParserWorldDef = new ParserWorldDef();
 	ParserBodyDef mParserBodyDef = new ParserBodyDef();
 	ParserFixtureDef mParserFixtureDef = new ParserFixtureDef();
 	ParserJointDef mParserJointDef = new ParserJointDef();
@@ -35,14 +43,30 @@ public class RubeParser extends ParserDef<RubeDef> {
 	AdapterListToParserDef<JointDef> mParserJoints = new AdapterListToParserDef<JointDef>("joint", mParserJointDef);
 	AdapterListToParserDef<ImageDef> mParserImages = new AdapterListToParserDef<ImageDef>("image", mParserImageDef);
 
+	private final IPhysicsWorldFactory mPhysicsWorldFactory;
+	private final IJointsFactory mJointsFactory;
+	private final IFixtureFactory mFixtureFactory;
+	private final IBodyFactory mBodyFactory;
+
+	public RubeParser() {
+		this(new PhysicsWorldFactory(), new BodyFactory(), new FixtureFactory(), new JointsFactory());
+	}
+
+	public RubeParser(IPhysicsWorldFactory pPhysicsWorldFactory, IBodyFactory pBodyFactory, IFixtureFactory pFixtureFactory, IJointsFactory pJointsFactory) {
+		this.mPhysicsWorldFactory = pPhysicsWorldFactory;
+		this.mBodyFactory = pBodyFactory;
+		this.mFixtureFactory = pFixtureFactory;
+		this.mJointsFactory = pJointsFactory;
+	}
+
 	@Override
 	protected RubeDef doParse(AutocastMap pMap) {
 		return doParse(new RubeDef(), pMap);
 	}
 
-	public RubeDef continueParse(PhysicsWorld pWorld, String pStringToParse) throws ParseException {
+	public RubeDef continueParse(IPhysicsWorldProvider pPhysicsWorldProvider, String pStringToParse) throws ParseException {
 		AutocastMap map = loadMapFromString(pStringToParse);
-		return doParse(new RubeDef(pWorld), map);
+		return doParse(new RubeDef(pPhysicsWorldProvider), map);
 	}
 
 	protected RubeDef doParse(RubeDef rubeDef, AutocastMap pMap) {
@@ -52,10 +76,10 @@ public class RubeParser extends ParserDef<RubeDef> {
 		mParserJoints.setParsingListener(new BasicListener<JointDef>());
 		mParserImages.setParsingListener(new BasicListener<ImageDef>());
 
-		if (rubeDef.world == null) {
-			WorldDef worldDef = mParserWorldDef.parse(pMap);
-			rubeDef.world = mParserWorldDef.createWorld(worldDef);
+		if (rubeDef.worldProvider == null) {
+			rubeDef.worldProvider = new PhysicsWorldProvider(pMap, this.mPhysicsWorldFactory);
 		}
+
 		mParserBodies.parse(pMap);
 		mParserJoints.parse(pMap);
 		mParserImages.parse(pMap);
@@ -82,7 +106,7 @@ public class RubeParser extends ParserDef<RubeDef> {
 
 		/* bodies */
 		for (int i = 0; i < bodycount; i++) {
-			Body b = mParserBodyDef.createBody(rubeDef.world, bodydefs.get(i), bodymaps.get(i));
+			Body b = mBodyFactory.produce(rubeDef.worldProvider.getWorld(), bodydefs.get(i), bodymaps.get(i));
 			rubeDef.registerBody(b, i, bodymaps.get(i).getString("name", ""));
 
 			installCustomProps(rubeDef, b, bodycustoms.get(i));
@@ -94,7 +118,7 @@ public class RubeParser extends ParserDef<RubeDef> {
 			List<ArrayList<AutocastMap>> fixturecustoms = mParserFixtures.getInflatedCustomPropertiesList();
 			int fixturecount = (fixturedefs != null) ? fixturedefs.size() : 0;
 			for (int j = 0; j < fixturecount; j++) {
-				Fixture f = mParserFixtureDef.createFixture(fixturedefs.get(j), b);
+				Fixture f = mFixtureFactory.produce(fixturedefs.get(j), b);
 				rubeDef.registerFixture(f, fixturemaps.get(j).getString("name", ""));
 
 				installCustomProps(rubeDef, f, fixturecustoms.get(j));
@@ -103,12 +127,12 @@ public class RubeParser extends ParserDef<RubeDef> {
 
 		/* joints - regular joints go first */
 		for (int i = 0; i < jointcount; i++) {
-			Joint j = mParserJointDef.createJoint(rubeDef.world, bodies, jointdefs.get(i), jointmaps.get(i));
+			Joint j = mJointsFactory.produce(rubeDef.worldProvider.getWorld(), bodies, jointdefs.get(i), jointmaps.get(i));
 			rubeDef.registerJoint(j, i, jointmaps.get(i).getString("name", ""));
 		}
 		/* joints - gearjoints go second (each gearjoint references two instances of regular joints) */
 		for (int i = 0; i < jointcount; i++) {
-			Joint j = mParserJointDef.createGearJoint(rubeDef.world, bodies, joints, jointdefs.get(i), jointmaps.get(i));
+			Joint j = mJointsFactory.produceGearJoint(rubeDef.worldProvider.getWorld(), bodies, joints, jointdefs.get(i), jointmaps.get(i));
 			rubeDef.registerJoint(j, i, jointmaps.get(i).getString("name", ""));
 
 			installCustomProps(rubeDef, joints.get(i), jointcustoms.get(i));

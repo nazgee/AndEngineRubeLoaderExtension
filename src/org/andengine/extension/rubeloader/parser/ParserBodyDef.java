@@ -42,17 +42,4 @@ public class ParserBodyDef extends ParserDef<BodyDef> {
 
 		return bodyDef;
 	}
-
-	// XXX factory?
-	public Body createBody(PhysicsWorld pWorld,final BodyDef pBodyDef, AutocastMap pMap) {
-		Body body = pWorld.createBody(pBodyDef);
-
-		MassData massData = new MassData();
-		massData.mass = pMap.getFloat("massData-mass", 0);
-		massData.center.set(pMap.getVector2("massData-center", new Vector2(0, 0)));
-		massData.I = pMap.getFloat("massData-I", 0);
-		body.setMassData(massData);
-
-		return body;
-	}
 }

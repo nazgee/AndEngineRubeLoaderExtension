@@ -3,11 +3,9 @@ package org.andengine.extension.rubeloader.parser;
 import org.andengine.extension.rubeloader.json.AutocastMap;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
@@ -93,8 +91,5 @@ public class ParserFixtureDef extends ParserDef<FixtureDef> {
 		}
 
 		return fixtureDef;
-	}
-	public Fixture createFixture(FixtureDef fixtureDef, Body body) {
-		return body.createFixture(fixtureDef);
 	}
 }
