@@ -76,6 +76,7 @@ public class Loader {
 
 		if (entity != null) {
 			if (pImageDef.body != null) {
+				entity.setAnchorCenter(-x / entity.getWidth() + 0.5f, -y / entity.getHeight() + 0.5f);
 
 				PhysicsConnector connector = populatePhysicsConnector(pRubeDef, pImageDef.body, entity);
 				pImageDef.body.setUserData(connector);
@@ -103,7 +104,6 @@ public class Loader {
 			VertexBufferObjectManager pVBOM, final int pZindex, final float pAngle) {
 		Sprite sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM);
 		sprite.setRotationOffset(MathUtils.radToDeg(-pAngle));
-		sprite.setAnchorCenter(-pX / pWidth + 0.5f, -pY / pHeight + 0.5f);
 		sprite.setCullingEnabled(true);
 		sprite.setZIndex(pZindex);
 		return sprite;
