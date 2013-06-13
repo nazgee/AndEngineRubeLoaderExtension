@@ -140,7 +140,14 @@ public class RubeParser extends ParserDef<RubeDef> {
 
 		/* images - not created here (let's say we want to handle physics only, and leave graphics to the user) */
 		for (int i = 0; i < imagecount; i++) {
-			mParserImageDef.bindWithBody(imagedefs.get(i), imagemaps.get(i), bodies);
+			ImageDef imageDef = imagedefs.get(i);
+			int bodyIndex = imagemaps.get(i).getInt("body", -1);
+			if (-1 != bodyIndex) {
+				imageDef.body = bodies.get(bodyIndex);
+			} else {
+				imageDef.body = null;
+			}
+
 			rubeDef.registerImage(imagedefs.get(i), i, imagemaps.get(i).getString("name", ""));
 
 			installCustomProps(rubeDef, images.get(i), imagecustoms.get(i));

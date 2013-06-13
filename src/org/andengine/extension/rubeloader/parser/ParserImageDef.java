@@ -63,10 +63,4 @@ public class ParserImageDef extends ParserDef<ImageDef> {
 
 		return img;
 	}
-
-	public void bindWithBody(ImageDef imageDef, AutocastMap pMap, Vector<Body> pBody) {
-		int bodyIndex = pMap.getInt("body", -1);
-		if (-1 != bodyIndex)
-			imageDef.body = pBody.get(bodyIndex);
-	}
 }
