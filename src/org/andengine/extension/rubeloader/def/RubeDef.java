@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
+import org.andengine.entity.IEntity;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.rubeloader.factory.IPhysicsWorldProvider;
 
@@ -59,7 +60,7 @@ public class RubeDef {
 	public static class RubeDefDataPrimitivesList {
 		public Vector<Body> bodies = new Vector<Body>();
 		public Vector<Joint> joints = new Vector<Joint>();
-		public Vector<ImageDef> images = new Vector<ImageDef>();
+		public Vector<IEntity> images = new Vector<IEntity>();
 
 		public void assureCapacities(int bodycount, int jointcount, int imagecount) {
 			bodies.ensureCapacity(bodycount);
@@ -72,7 +73,7 @@ public class RubeDef {
 		public Set<Body> m_bodiesWithRubeDefDataCustomProperties = new HashSet<Body>();
 		public Set<Fixture> m_fixturesWithRubeDefDataCustomProperties = new HashSet<Fixture>();
 		public Set<Joint> m_jointsWithRubeDefDataCustomProperties = new HashSet<Joint>();
-		public Set<ImageDef> m_imagesWithRubeDefDataCustomProperties = new HashSet<ImageDef>();
+		public Set<IEntity> m_imagesWithRubeDefDataCustomProperties = new HashSet<IEntity>();
 
 		public void register(Object item) {
 			if (item instanceof Body) {
@@ -81,8 +82,8 @@ public class RubeDef {
 				m_fixturesWithRubeDefDataCustomProperties.add((Fixture) item);
 			} else if (item instanceof Joint) {
 				m_jointsWithRubeDefDataCustomProperties.add((Joint) item);
-			} else if (item instanceof ImageDef) {
-				m_imagesWithRubeDefDataCustomProperties.add((ImageDef) item);
+			} else if (item instanceof IEntity) {
+				m_imagesWithRubeDefDataCustomProperties.add((IEntity) item);
 			}
 		}
 	}
@@ -91,7 +92,7 @@ public class RubeDef {
 		public Map<Body, String> m_bodyToNameMap = new HashMap<Body, String>();
 		public Map<Fixture, String> m_fixtureToNameMap = new HashMap<Fixture, String>();
 		public Map<Joint, String> m_jointToNameMap = new HashMap<Joint, String>();
-		public Map<ImageDef, String> m_imageToNameMap = new HashMap<ImageDef, String>();
+		public Map<IEntity, String> m_imageToNameMap = new HashMap<IEntity, String>();
 	}
 	public static class RubeDefDataIndexesMap {
 		public Map<Integer, Body> m_indexToBodyMap = new HashMap<Integer, Body>();
@@ -118,7 +119,7 @@ public class RubeDef {
 			indexes.m_jointToIndexMap.put(joint, index);
 		}
 	}
-	public void registerImage(ImageDef image, int index, String pName) {
+	public void registerEntity(IEntity image, int index, String pName) {
 		if (image != null) {
 			primitives.images.add(index, image);
 			names.m_imageToNameMap.put(image, pName);
@@ -193,8 +194,8 @@ public class RubeDef {
 	}
 
 	public ImageDef[] getImagesByName(String name) {
-		Set<ImageDef> keys = new HashSet<ImageDef>();
-		for (Entry<ImageDef, String> entry : names.m_imageToNameMap.entrySet()) {
+		Set<IEntity> keys = new HashSet<IEntity>();
+		for (Entry<IEntity, String> entry : names.m_imageToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				keys.add(entry.getKey());
 			}
@@ -202,7 +203,7 @@ public class RubeDef {
 		return keys.toArray(new ImageDef[0]);
 	}
 
-	public Vector<ImageDef> getAllImages() {
+	public Vector<IEntity> getAllImages() {
 		return primitives.images;
 	}
 
@@ -233,8 +234,8 @@ public class RubeDef {
 		return null;
 	}
 
-	public ImageDef getImageByName(String name) {
-		for (Entry<ImageDef, String> entry : names.m_imageToNameMap.entrySet()) {
+	public IEntity getImageByName(String name) {
+		for (Entry<IEntity, String> entry : names.m_imageToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				return entry.getKey();
 			}
@@ -778,50 +779,50 @@ public class RubeDef {
 	}
 
 	// get by custom property value (vector version, Image)
-	public int getImagesByCustomInt(String propertyName, int valueToMatch, Vector<ImageDef> items) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	public int getImagesByCustomInt(String propertyName, int valueToMatch, Vector<IEntity> items) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomInt(item, propertyName) && getCustomInt( item, propertyName, 0 ) == valueToMatch)
 				items.add(item);
 		}
 		return items.size();
 	}
 
-	public int getImagesByCustomFloat(String propertyName, float valueToMatch, Vector<ImageDef> items) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	public int getImagesByCustomFloat(String propertyName, float valueToMatch, Vector<IEntity> items) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomFloat(item, propertyName) && getCustomFloat( item, propertyName, 0 ) == valueToMatch)
 				items.add(item);
 		}
 		return items.size();
 	}
 
-	public int getImagesByCustomString(String propertyName, String valueToMatch, Vector<ImageDef> items) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	public int getImagesByCustomString(String propertyName, String valueToMatch, Vector<IEntity> items) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomString(item, propertyName) && getCustomString( item, propertyName, new String() ).equals(valueToMatch))
 				items.add(item);
 		}
 		return items.size();
 	}
 
-	public int getImagesByCustomVector(String propertyName, Vector2 valueToMatch, Vector<ImageDef> items) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	public int getImagesByCustomVector(String propertyName, Vector2 valueToMatch, Vector<IEntity> items) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomVector(item, propertyName) && getCustomVector( item, propertyName, new Vector2(0,0) ) == valueToMatch)
 				items.add(item);
 		}
 		return items.size();
 	}
 
-	public int getImagesByCustomBool(String propertyName, boolean valueToMatch, Vector<ImageDef> items) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	public int getImagesByCustomBool(String propertyName, boolean valueToMatch, Vector<IEntity> items) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomBool(item, propertyName) && getCustomBool( item, propertyName, false ) == valueToMatch)
 				items.add(item);
 		}
@@ -829,50 +830,50 @@ public class RubeDef {
 	}
 
 	// get by custom property value (single version, Image)
-	ImageDef getImageByCustomInt(String propertyName, int valueToMatch) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	IEntity getImageByCustomInt(String propertyName, int valueToMatch) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomInt(item, propertyName) && getCustomInt( item, propertyName, 0 ) == valueToMatch)
 				return item;
 		}
 		return null;
 	}
 
-	ImageDef getImageByCustomFloat(String propertyName, float valueToMatch) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	IEntity getImageByCustomFloat(String propertyName, float valueToMatch) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomFloat(item, propertyName) && getCustomFloat( item, propertyName, 0 ) == valueToMatch)
 				return item;
 		}
 		return null;
 	}
 
-	ImageDef getImageByCustomString(String propertyName, String valueToMatch) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	IEntity getImageByCustomString(String propertyName, String valueToMatch) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomString(item, propertyName) && getCustomString( item, propertyName, new String() ).equals(valueToMatch))
 				return item;
 		}
 		return null;
 	}
 
-	ImageDef getImageByCustomVector(String propertyName, Vector2 valueToMatch) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	IEntity getImageByCustomVector(String propertyName, Vector2 valueToMatch) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomVector(item, propertyName) && getCustomVector( item, propertyName, new Vector2(0,0) ) == valueToMatch)
 				return item;
 		}
 		return null;
 	}
 
-	ImageDef getImageByCustomBool(String propertyName, boolean valueToMatch) {
-		Iterator<ImageDef> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
+	IEntity getImageByCustomBool(String propertyName, boolean valueToMatch) {
+		Iterator<IEntity> iterator = customs.m_imagesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
-			ImageDef item = iterator.next();
+			IEntity item = iterator.next();
 			if (hasCustomBool(item, propertyName) && getCustomBool( item, propertyName, false ) == valueToMatch)
 				return item;
 		}

@@ -1,12 +1,7 @@
 package org.andengine.extension.rubeloader.parser;
 
-import java.util.Vector;
-
 import org.andengine.extension.rubeloader.def.ImageDef;
 import org.andengine.extension.rubeloader.json.AutocastMap;
-
-import com.badlogic.gdx.physics.box2d.Body;
-
 
 public class ParserImageDef extends ParserDef<ImageDef> {
 

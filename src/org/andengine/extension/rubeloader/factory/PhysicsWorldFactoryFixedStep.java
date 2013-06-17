@@ -4,10 +4,10 @@ import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.rubeloader.def.WorldDef;
 
-public class FixedStepPhysicsWorldFactory extends PhysicsWorldFactory {
+public class PhysicsWorldFactoryFixedStep extends PhysicsWorldFactory {
 	private final int mStepsPerSecond;
 
-	public FixedStepPhysicsWorldFactory(int pStepsPerSecond) {
+	public PhysicsWorldFactoryFixedStep(int pStepsPerSecond) {
 		super();
 		this.mStepsPerSecond = pStepsPerSecond;
 	}
