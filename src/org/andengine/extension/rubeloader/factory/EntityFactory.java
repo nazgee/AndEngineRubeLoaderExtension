@@ -15,8 +15,6 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.math.MathUtils;
 
-import com.badlogic.gdx.physics.box2d.Body;
-
 /**
  * Simple implementation of IEntityFactory. It will try to create Sprite instance for
  * all the ImageDef provided.
