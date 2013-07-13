@@ -8,10 +8,11 @@ import org.andengine.entity.sprite.UncoloredSprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
-import org.andengine.extension.rubeloader.Loader.ITextureProvider;
+import org.andengine.extension.rubeloader.ITextureProvider;
 import org.andengine.extension.rubeloader.def.ImageDef;
 import org.andengine.extension.rubeloader.json.AutocastMap;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.math.MathUtils;
 
@@ -122,8 +123,24 @@ public class EntityFactory implements IEntityFactory {
 	 * @return
 	 */
 	protected Sprite createSprite(final float pX, final float pY, final float pWidth, final float pHeight, final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pAngle) {
-		Sprite sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM);
-		sprite.setRotationOffset(MathUtils.radToDeg(-pAngle));
+		/**
+		 * We should get rid of this rotation mess, when setRotationOffset() will eventualy find it's way to
+		 * AndEngine main branch.
+		 */
+		Sprite sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM) {
+			private final float mRotationOffset;
+			{
+				this.mRotationOffset = MathUtils.radToDeg(-pAngle);
+			}
+
+			@Override
+			protected void applyRotation(GLState pGLState) {
+				this.mRotation += this.mRotationOffset;
+				super.applyRotation(pGLState);
+				this.mRotation -= this.mRotationOffset;
+			}
+		};
+		//sprite.setRotationOffset(MathUtils.radToDeg(-pAngle));
 		sprite.setCullingEnabled(true);
 		sprite.setZIndex(pZindex);
 		return sprite;

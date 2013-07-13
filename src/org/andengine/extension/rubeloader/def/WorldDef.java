@@ -3,8 +3,6 @@ package org.andengine.extension.rubeloader.def;
 import com.badlogic.gdx.math.Vector2;
 
 public class WorldDef {
-	public float m_simulationFPS;
-
 	public int positionIterations;
 	public int velocityIterations;
 	public boolean allowSleep;

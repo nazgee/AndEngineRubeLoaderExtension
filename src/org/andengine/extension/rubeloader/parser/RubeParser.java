@@ -8,7 +8,7 @@ import net.minidev.json.parser.ParseException;
 
 import org.andengine.entity.IEntity;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.extension.rubeloader.Loader.ITextureProvider;
+import org.andengine.extension.rubeloader.ITextureProvider;
 import org.andengine.extension.rubeloader.def.ImageDef;
 import org.andengine.extension.rubeloader.def.RubeDef;
 import org.andengine.extension.rubeloader.factory.BodyFactory;
