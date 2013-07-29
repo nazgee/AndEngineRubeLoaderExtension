@@ -89,7 +89,11 @@ public class AutocastMap extends LinkedHashMap<String, Object> {
 		Vector2[] ret = new Vector2[size];
 
 		for (int i = 0; i < size; i++) {
-			ret[i] = (new Vector2((Float)listX.get(i), (Float)listY.get(i)));
+			Object objectX = listX.get(i);
+			Object objectY = listY.get(i);
+			Float x = (objectX instanceof Integer) ? (Integer)objectX : (Float)objectX;
+			Float y = (objectY instanceof Integer) ? (Integer)objectY : (Float)objectY;
+			ret[i] = (new Vector2(x, y));
 		}
 		return ret;
 	}
