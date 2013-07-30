@@ -20,7 +20,8 @@ public class ParserImageDef extends ParserDef<ImageDef> {
 
 		img.center = pMap.getVector2("center");
 		img.angle = pMap.getFloat("angle", 0);
-		img.scale = pMap.getFloat("scale");
+		img.heightWorldUnits = pMap.getFloat("scale");
+		img.aspectScale = pMap.getFloat("aspectScale", 1);
 		img.opacity = pMap.getFloat("opacity");
 		img.renderOrder = pMap.getFloat("renderOrder", 0);
 

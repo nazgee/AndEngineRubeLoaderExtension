@@ -80,8 +80,8 @@ public class EntityFactory implements IEntityFactory {
 	
 		final float p2m = getPixelToMeterRatio(image);
 		final ITextureRegion region = this.mTextureProvider.get(new File(image.file).getName());
-		final float scale = image.scale * p2m / region.getHeight();
-		final float w = region.getWidth() * scale;
+		final float scale = image.heightWorldUnits * p2m / region.getHeight();
+		final float w = region.getWidth() * scale * image.aspectScale;
 		final float h = region.getHeight() * scale;
 
 		final float x = image.center.x * p2m;

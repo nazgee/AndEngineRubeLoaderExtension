@@ -9,7 +9,8 @@ public class ImageDef {
 	public Body body;
 	public Vector2 center;
 	public float angle;
-	public float scale;
+	public float heightWorldUnits;
+	public float aspectScale;
 	public boolean flip;
 	public float opacity;
 	public int filter; // 0 = nearest, 1 = linear
