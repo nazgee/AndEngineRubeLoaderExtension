@@ -92,7 +92,7 @@ public class EntityFactory implements IEntityFactory {
 
 
 	protected IEntity produceImpl(float x, float y, float w, float h, ITextureRegion region, VertexBufferObjectManager pVBOM, IEntity pSceneEntity, ITextureProvider pTextureProvider, PhysicsWorld pWorld, ImageDef pImageDef, AutocastMap pAutocastMap) {
-		IEntity entity = createSprite(x, y, w, h, region, pVBOM, (int)pImageDef.renderOrder, pImageDef.angle);
+		IEntity entity = createSprite(x, y, w, h, region, pVBOM, (int)pImageDef.renderOrder, pImageDef.angle, pImageDef.flip);
 
 		if (entity != null) {
 			if (pImageDef.body != null) {
@@ -120,9 +120,10 @@ public class EntityFactory implements IEntityFactory {
 	 * @param pVBOM
 	 * @param pZindex
 	 * @param pAngle
+	 * @param pFlipped 
 	 * @return
 	 */
-	protected Sprite createSprite(final float pX, final float pY, final float pWidth, final float pHeight, final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pAngle) {
+	protected Sprite createSprite(final float pX, final float pY, final float pWidth, final float pHeight, final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pAngle, boolean pFlipped) {
 		/**
 		 * We should get rid of this rotation mess, when setRotationOffset() will eventualy find it's way to
 		 * AndEngine main branch.
@@ -143,6 +144,7 @@ public class EntityFactory implements IEntityFactory {
 		//sprite.setRotationOffset(MathUtils.radToDeg(-pAngle));
 		sprite.setCullingEnabled(true);
 		sprite.setZIndex(pZindex);
+		sprite.setFlippedHorizontal(pFlipped);
 		return sprite;
 	}
 
