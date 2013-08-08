@@ -14,6 +14,7 @@ import org.andengine.extension.rubeloader.json.AutocastMap;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.exception.AndEngineRuntimeException;
 import org.andengine.util.math.MathUtils;
 
 /**
@@ -75,11 +76,15 @@ public class EntityFactory implements IEntityFactory {
 	@Override
 	public IEntity produce(PhysicsWorld pWorld, ImageDef image, AutocastMap pAutocastMap) {
 		if (!isConfigured) {
-			throw new RuntimeException("configure() was not called on this instance of " + getClass().getSimpleName());
+			throw new AndEngineRuntimeException("configure() was not called on this instance of " + getClass().getSimpleName());
 		}
 	
 		final float p2m = getPixelToMeterRatio(image);
-		final ITextureRegion region = this.mTextureProvider.get(new File(image.file).getName());
+		String wantedTextureRegion = new File(image.file).getName();
+		final ITextureRegion region = this.mTextureProvider.get(wantedTextureRegion);
+		if (region == null) {
+			throw new AndEngineRuntimeException("ITextureProvider returned null, when asked for " + wantedTextureRegion + " texture region");
+		}
 		final float scale = image.heightWorldUnits * p2m / region.getHeight();
 		final float w = region.getWidth() * scale * image.aspectScale;
 		final float h = region.getHeight() * scale;
