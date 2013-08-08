@@ -56,7 +56,7 @@ public class RubeParser extends ParserDef<RubeDef> {
 	// Fields
 	// ===========================================================
 
-	private final IPhysicsWorldFactory mPhysicsWorldFactory;
+	private IPhysicsWorldFactory mPhysicsWorldFactory;
 	private final IJointsFactory mJointsFactory;
 	private final IFixtureFactory mFixtureFactory;
 	private final IBodyFactory mBodyFactory;
@@ -70,9 +70,14 @@ public class RubeParser extends ParserDef<RubeDef> {
 		this(new PhysicsWorldFactory(), new BodyFactory(), new FixtureFactory(), new JointsFactory(), pEntityFactory);
 	}
 
+	public RubeParser(IPhysicsWorldFactory pPhysicsWorldFactory, final IEntityFactory pEntityFactory) {
+		this(pPhysicsWorldFactory, new BodyFactory(), new FixtureFactory(), new JointsFactory(), pEntityFactory);
+	}
+
 	public RubeParser(IEntity pSceneEntity, ITextureProvider pTextureProvider, VertexBufferObjectManager pVBOM) {
 		this(new PhysicsWorldFactory(), new BodyFactory(), new FixtureFactory(), new JointsFactory(), new EntityFactory(pSceneEntity, pTextureProvider, pVBOM));
 	}
+
 
 	public RubeParser(IPhysicsWorldFactory pPhysicsWorldFactory, IBodyFactory pBodyFactory, IFixtureFactory pFixtureFactory, IJointsFactory pJointsFactory, IEntityFactory pEntityFactory) {
 		this.mPhysicsWorldFactory = pPhysicsWorldFactory;
@@ -104,6 +109,13 @@ public class RubeParser extends ParserDef<RubeDef> {
 		this.mEntityFactory = mEntityFactory;
 	}
 
+	public IPhysicsWorldFactory getPhysicsWorldFactory() {
+		return mPhysicsWorldFactory;
+	}
+
+	public void setPhysicsWorldFactory(IPhysicsWorldFactory pPhysicsWorldFactory) {
+		mPhysicsWorldFactory = pPhysicsWorldFactory;
+	}
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================

@@ -8,6 +8,7 @@ import org.andengine.entity.IEntity;
 import org.andengine.extension.rubeloader.def.RubeDef;
 import org.andengine.extension.rubeloader.factory.EntityFactory;
 import org.andengine.extension.rubeloader.factory.IEntityFactory;
+import org.andengine.extension.rubeloader.factory.IPhysicsWorldFactory;
 import org.andengine.extension.rubeloader.factory.IPhysicsWorldProvider;
 import org.andengine.extension.rubeloader.parser.RubeParser;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
@@ -43,6 +44,11 @@ public class RubeLoader {
 
 	public RubeLoader(final IEntityFactory pEntityFactory) {
 		this.mRubeParser = new RubeParser(pEntityFactory);
+		this.mEntityFactory = pEntityFactory;
+	}
+
+	public RubeLoader(final IPhysicsWorldFactory pPhysicsWorldFactory, final IEntityFactory pEntityFactory) {
+		this.mRubeParser = new RubeParser(pPhysicsWorldFactory, pEntityFactory);
 		this.mEntityFactory = pEntityFactory;
 	}
 	// ===========================================================
