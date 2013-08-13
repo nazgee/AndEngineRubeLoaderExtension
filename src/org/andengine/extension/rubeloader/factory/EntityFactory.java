@@ -2,7 +2,9 @@ package org.andengine.extension.rubeloader.factory;
 
 import java.io.File;
 
+import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.sprite.UncoloredSprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
@@ -14,8 +16,11 @@ import org.andengine.extension.rubeloader.json.AutocastMap;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.adt.color.Color;
 import org.andengine.util.exception.AndEngineRuntimeException;
 import org.andengine.util.math.MathUtils;
+
+import android.util.Log;
 
 /**
  * Simple implementation of IEntityFactory. It will try to create Sprite instance for
@@ -80,6 +85,35 @@ public class EntityFactory implements IEntityFactory {
 		}
 	
 		final float p2m = getPixelToMeterRatio(image);
+		if (image.file == null) {
+			/*
+			 * This is strange, that I have to put this check here, but (apparently) it happens in some cases...
+			 */
+			Log.e(getClass().getSimpleName(), "No file name was given. This is either parsing or .json error. Substitute graphics will be created (simple red X with white border).");
+
+			Entity errorEntity = new Entity(image.center.x * p2m, image.center.y * p2m);
+
+			Rectangle bar1out = new Rectangle(0, 0, 110, 25, this.mVBOM);
+			Rectangle bar1in = new Rectangle(0, 0, 100, 20, this.mVBOM);
+			Rectangle bar2out = new Rectangle(0, 0, 110, 25, this.mVBOM);
+			Rectangle bar2in = new Rectangle(0, 0, 100, 20, this.mVBOM);
+
+			bar1out.setRotation(+45);
+			bar1in.setRotation(+45);
+			bar2out.setRotation(-45);
+			bar2in.setRotation(-45);
+
+			bar1out.setColor(Color.WHITE);
+			bar1in.setColor(Color.RED);
+			bar2out.setColor(Color.WHITE);
+			bar2in.setColor(Color.RED);
+
+			errorEntity.attachChild(bar1out);
+			errorEntity.attachChild(bar2out);
+			errorEntity.attachChild(bar1in);
+			errorEntity.attachChild(bar2in);
+			return errorEntity;
+		}
 		String wantedTextureRegion = new File(image.file).getName();
 		final ITextureRegion region = this.mTextureProvider.get(wantedTextureRegion);
 		if (region == null) {

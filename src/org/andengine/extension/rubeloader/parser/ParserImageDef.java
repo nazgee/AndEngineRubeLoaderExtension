@@ -15,8 +15,11 @@ public class ParserImageDef extends ParserDef<ImageDef> {
 		}
 
 		String fileName = pMap.getString("file", "");
-		if (!fileName.equals(""))
+		if (!fileName.equals("")) {
 			img.file = fileName;
+		} else {
+			img.file = null;
+		}
 
 		img.center = pMap.getVector2("center");
 		img.angle = pMap.getFloat("angle", 0);
