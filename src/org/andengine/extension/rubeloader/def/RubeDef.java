@@ -193,14 +193,14 @@ public class RubeDef {
 		return keys.toArray(new Joint[0]);
 	}
 
-	public ImageDef[] getImagesByName(String name) {
+	public IEntity[] getImagesByName(String name) {
 		Set<IEntity> keys = new HashSet<IEntity>();
 		for (Entry<IEntity, String> entry : names.m_imageToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				keys.add(entry.getKey());
 			}
 		}
-		return keys.toArray(new ImageDef[0]);
+		return keys.toArray(new IEntity[0]);
 	}
 
 	public Vector<IEntity> getAllImages() {
