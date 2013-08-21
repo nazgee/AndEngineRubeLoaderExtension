@@ -32,8 +32,8 @@ public class RubeLoader {
 	// Fields
 	// ===========================================================
 
-	private RubeParser mRubeParser;
-	private IEntityFactory mEntityFactory;
+	protected final RubeParser mRubeParser;
+	protected final IEntityFactory mEntityFactory;
 
 	// ===========================================================
 	// Constructors
