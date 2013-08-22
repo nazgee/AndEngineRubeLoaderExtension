@@ -9,6 +9,7 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.sprite.UncoloredSprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.andengine.extension.rubeloader.ITextureProvider;
 import org.andengine.extension.rubeloader.def.ImageDef;
@@ -19,6 +20,8 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.adt.color.Color;
 import org.andengine.util.exception.AndEngineRuntimeException;
 import org.andengine.util.math.MathUtils;
+
+import com.badlogic.gdx.math.Vector2;
 
 import android.util.Log;
 
@@ -83,7 +86,7 @@ public class EntityFactory implements IEntityFactory {
 		if (!isConfigured) {
 			throw new AndEngineRuntimeException("configure() was not called on this instance of " + getClass().getSimpleName());
 		}
-	
+
 		final float p2m = getPixelToMeterRatio(image);
 		if (image.file == null) {
 			/*
@@ -131,16 +134,38 @@ public class EntityFactory implements IEntityFactory {
 
 
 	protected IEntity produceImpl(float x, float y, float w, float h, ITextureRegion region, VertexBufferObjectManager pVBOM, IEntity pSceneEntity, ITextureProvider pTextureProvider, PhysicsWorld pWorld, ImageDef pImageDef, AutocastMap pAutocastMap) {
-		IEntity entity = createSprite(x, y, w, h, region, pVBOM, (int)pImageDef.renderOrder, pImageDef.angle, pImageDef.flip);
+		float requestedRotationOffset;
+		float requestedRotation;
+
+		if (pImageDef.body != null) {
+			requestedRotation = 0; //physics connector will rotate appropriately
+			requestedRotationOffset = pImageDef.angle;
+		} else {
+			requestedRotation = pImageDef.angle;
+			requestedRotationOffset = 0;
+		}
+
+		IEntity entity = createSprite(x, y, w, h, region, pVBOM, Math.round(pImageDef.renderOrder), requestedRotation, requestedRotationOffset, pImageDef.flip);
 
 		if (entity != null) {
 			if (pImageDef.body != null) {
-				entity.setAnchorCenter(-x / entity.getWidth() + 0.5f, -y / entity.getHeight() + 0.5f);
+				Vector2 dissplacement = Vector2Pool.obtain();
+
+				dissplacement.set(x, y);
+				dissplacement.rotate(MathUtils.radToDeg((float) (Math.PI - requestedRotationOffset)));
+				x = dissplacement.x;
+				y = dissplacement.y;
+
+				final float anchorCenterX = x / entity.getWidth() + 0.5f;
+				final float anchorCenterY = y / entity.getHeight() + 0.5f;
+
+				entity.setAnchorCenter(anchorCenterX, anchorCenterY);
 
 				PhysicsConnector connector = createPhysicsConnector(pWorld, pImageDef, entity);
-				pImageDef.body.setUserData(connector);
 				entity.setUserData(connector);
 				pWorld.registerPhysicsConnector(connector);
+
+				Vector2Pool.recycle(dissplacement);
 			}
 
 			pSceneEntity.attachChild(entity);
@@ -158,11 +183,12 @@ public class EntityFactory implements IEntityFactory {
 	 * @param region
 	 * @param pVBOM
 	 * @param pZindex
-	 * @param pAngle
+	 * @param requestedRotation
+	 * @param requestedRotationOffset
 	 * @param pFlipped 
 	 * @return
 	 */
-	protected Sprite createSprite(final float pX, final float pY, final float pWidth, final float pHeight, final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pAngle, boolean pFlipped) {
+	protected Sprite createSprite(final float pX, final float pY, final float pWidth, final float pHeight, final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pRequestedRotation, final float pRequestedRotationOffset, boolean pFlipped) {
 		/**
 		 * We should get rid of this rotation mess, when setRotationOffset() will eventualy find it's way to
 		 * AndEngine main branch.
@@ -170,7 +196,7 @@ public class EntityFactory implements IEntityFactory {
 		Sprite sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM) {
 			private final float mRotationOffset;
 			{
-				this.mRotationOffset = MathUtils.radToDeg(-pAngle);
+				this.mRotationOffset = MathUtils.radToDeg(-pRequestedRotationOffset);
 			}
 
 			@Override
@@ -181,7 +207,8 @@ public class EntityFactory implements IEntityFactory {
 			}
 		};
 		//sprite.setRotationOffset(MathUtils.radToDeg(-pAngle));
-		sprite.setCullingEnabled(true);
+		sprite.setRotation(MathUtils.radToDeg(-pRequestedRotation));
+		sprite.setCullingEnabled(false);
 		sprite.setZIndex(pZindex);
 		sprite.setFlippedHorizontal(pFlipped);
 		return sprite;
