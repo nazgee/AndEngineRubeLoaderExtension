@@ -18,6 +18,7 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.adt.color.Color;
+import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.exception.AndEngineRuntimeException;
 import org.andengine.util.math.MathUtils;
 
@@ -145,7 +146,8 @@ public class EntityFactory implements IEntityFactory {
 			requestedRotationOffset = 0;
 		}
 
-		IEntity entity = createSprite(x, y, w, h, region, pVBOM, Math.round(pImageDef.renderOrder), requestedRotation, requestedRotationOffset, pImageDef.flip);
+		
+		IEntity entity = createSprite(x, y, w, h, pImageDef.colorTint, region, pVBOM, Math.round(pImageDef.renderOrder), requestedRotation, requestedRotationOffset, pImageDef.flip);
 
 		if (entity != null) {
 			if (pImageDef.body != null) {
@@ -188,24 +190,42 @@ public class EntityFactory implements IEntityFactory {
 	 * @param pFlipped 
 	 * @return
 	 */
-	protected Sprite createSprite(final float pX, final float pY, final float pWidth, final float pHeight, final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pRequestedRotation, final float pRequestedRotationOffset, boolean pFlipped) {
+	protected Sprite createSprite(final float pX, final float pY, final float pWidth, final float pHeight, final Color pColorTint, final ITextureRegion region, VertexBufferObjectManager pVBOM, final int pZindex, final float pRequestedRotation, final float pRequestedRotationOffset, boolean pFlipped) {
 		/**
 		 * We should get rid of this rotation mess, when setRotationOffset() will eventualy find it's way to
 		 * AndEngine main branch.
 		 */
-		Sprite sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM) {
-			private final float mRotationOffset;
-			{
-				this.mRotationOffset = MathUtils.radToDeg(-pRequestedRotationOffset);
-			}
-
-			@Override
-			protected void applyRotation(GLState pGLState) {
-				this.mRotation += this.mRotationOffset;
-				super.applyRotation(pGLState);
-				this.mRotation -= this.mRotationOffset;
-			}
-		};
+		Sprite sprite;
+		if (pColorTint.equals(Color.WHITE)) {
+			sprite = new UncoloredSprite(pX, pY, pWidth, pHeight, region, pVBOM) {
+				private final float mRotationOffset;
+				{
+					this.mRotationOffset = MathUtils.radToDeg(-pRequestedRotationOffset);
+				}
+	
+				@Override
+				protected void applyRotation(GLState pGLState) {
+					this.mRotation += this.mRotationOffset;
+					super.applyRotation(pGLState);
+					this.mRotation -= this.mRotationOffset;
+				}
+			};
+		} else {
+			sprite = new Sprite(pX, pY, pWidth, pHeight, region, pVBOM) {
+				private final float mRotationOffset;
+				{
+					this.mRotationOffset = MathUtils.radToDeg(-pRequestedRotationOffset);
+				}
+	
+				@Override
+				protected void applyRotation(GLState pGLState) {
+					this.mRotation += this.mRotationOffset;
+					super.applyRotation(pGLState);
+					this.mRotation -= this.mRotationOffset;
+				}
+			};
+		}
+		sprite.setColor(pColorTint);
 		//sprite.setRotationOffset(MathUtils.radToDeg(-pAngle));
 		sprite.setRotation(MathUtils.radToDeg(-pRequestedRotation));
 		sprite.setCullingEnabled(false);

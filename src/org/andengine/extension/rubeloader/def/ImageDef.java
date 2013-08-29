@@ -1,5 +1,7 @@
 package org.andengine.extension.rubeloader.def;
 
+import org.andengine.util.adt.color.Color;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
@@ -23,5 +25,5 @@ public class ImageDef {
 	public float uvCoords[];
 	public int numIndices;
 	public short indices[];
-
+	public Color colorTint;
 }

@@ -1,7 +1,11 @@
 package org.andengine.extension.rubeloader.parser;
 
+import java.util.List;
+
 import org.andengine.extension.rubeloader.def.ImageDef;
 import org.andengine.extension.rubeloader.json.AutocastMap;
+import org.andengine.util.adt.color.Color;
+import org.andengine.util.adt.color.ColorUtils;
 
 public class ParserImageDef extends ParserDef<ImageDef> {
 
@@ -33,6 +37,17 @@ public class ParserImageDef extends ParserDef<ImageDef> {
 		img.filter = pMap.getInt("filter", 1);
 
 		img.corners = pMap.getVector2Array("corners");
+
+
+		img.colorTint = new Color(1, 1, 1);
+		if (pMap.containsKey("colorTint")) {
+			List<Object> listRGBA = pMap.getList("colorTint");
+			int r = (Integer) listRGBA.get(0);
+			int g = (Integer) listRGBA.get(1);
+			int b = (Integer) listRGBA.get(2);
+			int a = (Integer) listRGBA.get(3);
+			img.colorTint.set(r/255f, g/255f, b/255f, a/255f);
+		}
 
 //		if (img.file.contains("bg-mountains-3")) {
 //			System.out.println("bg-mountains-3 = " + pMap);
