@@ -3,6 +3,7 @@ package org.andengine.extension.rubeloader.def;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -24,6 +25,7 @@ public class RubeDef {
 	public RubeDefDataIndexesMap indexes = new RubeDefDataIndexesMap();
 	public RubeDefDataNamesMap names = new RubeDefDataNamesMap();
 	public RubeDefDataCustomizedSet customs = new RubeDefDataCustomizedSet();
+	public Map<Body, LinkedList<IEntity>> mBodyToEntitiesMap = new HashMap<Body, LinkedList<IEntity>>();
 
 	// This maps an item (Body, Fixture etc) to a set of custom properties.
 	// Use null for world properties.
@@ -126,7 +128,18 @@ public class RubeDef {
 		}
 	}
 
+	public void mapEntityToBody(IEntity pEntity, Body body) {
+		LinkedList<IEntity> entities = mBodyToEntitiesMap.get(body);
+		if (entities == null) {
+			entities = new LinkedList<IEntity>();
+			mBodyToEntitiesMap.put(body, entities);
+		}
+		entities.add(pEntity);
+	}
 
+	public LinkedList<IEntity> getImages(Body pBody) {
+		return mBodyToEntitiesMap.get(pBody);
+	}
 
 
 
@@ -879,4 +892,5 @@ public class RubeDef {
 		}
 		return null;
 	}
+
 }
