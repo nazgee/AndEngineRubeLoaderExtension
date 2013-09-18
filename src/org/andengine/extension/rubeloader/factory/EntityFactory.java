@@ -161,7 +161,11 @@ public class EntityFactory implements IEntityFactory {
 				final float anchorCenterX = x / entity.getWidth() + 0.5f;
 				final float anchorCenterY = y / entity.getHeight() + 0.5f;
 
+				// sadly, we need to modify offset and rotation centers
 				entity.setAnchorCenter(anchorCenterX, anchorCenterY);
+				// now we need to restore scale and skew
+				entity.setScaleCenter(0.5f, 0.5f);
+				entity.setSkewCenter(0.5f, 0.5f);
 
 				PhysicsConnector connector = createPhysicsConnector(pWorld, pImageDef, entity);
 				entity.setUserData(connector);
