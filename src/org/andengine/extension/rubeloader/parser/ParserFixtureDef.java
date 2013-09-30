@@ -21,7 +21,7 @@ public class ParserFixtureDef extends ParserDef<FixtureDef> {
 
 		FixtureDef fixtureDef = new FixtureDef();
 
-		fixtureDef.restitution = pMap.getFloat("restitution", 0.5f); //XXX default restitution?
+		fixtureDef.restitution = pMap.getFloat("restitution", 0.0f);
 		fixtureDef.friction = pMap.getFloat("friction");
 		fixtureDef.density = pMap.getFloat("density", 0);
 		fixtureDef.isSensor = pMap.getBool("sensor", false);
