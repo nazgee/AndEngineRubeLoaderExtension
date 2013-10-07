@@ -6,7 +6,7 @@ import org.andengine.extension.rubeloader.def.WorldDef;
 public class PhysicsWorldFactory implements IPhysicsWorldFactory {
 	@Override
 	public PhysicsWorld populate(WorldDef pWorldDef) {
-		PhysicsWorld ret = new PhysicsWorld(pWorldDef.gravity, pWorldDef.allowSleep, pWorldDef.positionIterations, pWorldDef.velocityIterations);
+		PhysicsWorld ret = new PhysicsWorld(pWorldDef.gravity, pWorldDef.allowSleep, pWorldDef.velocityIterations, pWorldDef.positionIterations);
 		tuneParams(pWorldDef, ret);
 		return ret;
 	}
