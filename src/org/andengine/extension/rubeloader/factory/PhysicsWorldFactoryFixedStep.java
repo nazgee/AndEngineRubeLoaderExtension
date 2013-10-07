@@ -14,7 +14,7 @@ public class PhysicsWorldFactoryFixedStep extends PhysicsWorldFactory {
 
 	@Override
 	public PhysicsWorld populate(WorldDef pWorldDef) {
-		PhysicsWorld ret = new FixedStepPhysicsWorld(mStepsPerSecond, pWorldDef.gravity, pWorldDef.allowSleep, pWorldDef.positionIterations, pWorldDef.velocityIterations);
+		PhysicsWorld ret = new FixedStepPhysicsWorld(mStepsPerSecond, pWorldDef.gravity, pWorldDef.allowSleep, pWorldDef.velocityIterations, pWorldDef.positionIterations);
 		tuneParams(pWorldDef, ret);
 		return ret;
 	}
