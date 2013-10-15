@@ -18,13 +18,12 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.adt.color.Color;
-import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.exception.AndEngineRuntimeException;
 import org.andengine.util.math.MathUtils;
 
-import com.badlogic.gdx.math.Vector2;
-
 import android.util.Log;
+
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Simple implementation of IEntityFactory. It will try to create Sprite instance for

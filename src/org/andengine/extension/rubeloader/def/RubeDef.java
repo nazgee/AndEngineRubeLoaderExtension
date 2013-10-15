@@ -12,6 +12,7 @@ import java.util.Vector;
 import org.andengine.entity.IEntity;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.rubeloader.factory.IPhysicsWorldProvider;
+import org.andengine.util.adt.color.Color;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -49,6 +50,7 @@ public class RubeDef {
 		Map<String, String> m_customPropertyMap_string;
 		Map<String, Vector2> m_customPropertyMap_vec2;
 		Map<String, Boolean> m_customPropertyMap_bool;
+		Map<String, Color> m_customPropertyMap_color;
 
 		public RubeDefDataCustomProperties() {
 			m_customPropertyMap_int = new HashMap<String, Integer>();
@@ -56,6 +58,7 @@ public class RubeDef {
 			m_customPropertyMap_string = new HashMap<String, String>();
 			m_customPropertyMap_vec2 = new HashMap<String, Vector2>();
 			m_customPropertyMap_bool = new HashMap<String, Boolean>();
+			m_customPropertyMap_color = new HashMap<String, Color>();
 		}
 	}
 
@@ -297,111 +300,10 @@ public class RubeDef {
 		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_bool.put(propertyName, val);
 	}
 
-
-//	public void setCustomInt(Body item, String propertyName, int val) {
-//		customs.m_bodiesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_int.put(propertyName, val);
-//	}
-//
-//	public void setCustomFloat(Body item, String propertyName, float val) {		
-//		customs.m_bodiesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
-//	}
-//
-//	public void setCustomString(Body item, String propertyName, String val) {
-//		customs.m_bodiesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_string.put(propertyName, val);
-//	}
-//
-//	public void setCustomVector(Body item, String propertyName, Vector2 val) {
-//		customs.m_bodiesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_vec2.put(propertyName, val);
-//	}
-//
-//	public void setCustomBool(Body item, String propertyName, boolean val) {
-//		customs.m_bodiesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_bool.put(propertyName, val);
-//	}
-//	
-//	
-//	public void setCustomInt(Fixture item, String propertyName, int val) {
-//		customs.m_fixturesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_int.put(propertyName, val);
-//	}
-//
-//	public void setCustomFloat(Fixture item, String propertyName, float val) {
-//		customs.m_fixturesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
-//	}
-//
-//	public void setCustomString(Fixture item, String propertyName, String val) {
-//		customs.m_fixturesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_string.put(propertyName, val);
-//	}
-//
-//	public void setCustomVector(Fixture item, String propertyName, Vector2 val) {
-//		customs.m_fixturesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_vec2.put(propertyName, val);
-//	}
-//
-//	public void setCustomBool(Fixture item, String propertyName, boolean val) {
-//		customs.m_fixturesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_bool.put(propertyName, val);
-//	}
-//	
-//	
-//	public void setCustomInt(Joint item, String propertyName, int val) {
-//		customs.m_jointsWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_int.put(propertyName, val);
-//	}
-//
-//	public void setCustomFloat(Joint item, String propertyName, float val) {
-//		customs.m_jointsWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
-//	}
-//
-//	public void setCustomString(Joint item, String propertyName, String val) {
-//		customs.m_jointsWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_string.put(propertyName, val);
-//	}
-//
-//	public void setCustomVector(Joint item, String propertyName, Vector2 val) {
-//		customs.m_jointsWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_vec2.put(propertyName, val);
-//	}
-//
-//	public void setCustomBool(Joint item, String propertyName, boolean val) {
-//		customs.m_jointsWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_bool.put(propertyName, val);
-//	}
-//	
-//	
-//	public void setCustomInt(ImageDef item, String propertyName, int val) {
-//		customs.m_imagesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_int.put(propertyName, val);
-//	}
-//
-//	public void setCustomFloat(ImageDef item, String propertyName, float val) {
-//		customs.m_imagesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_float.put(propertyName, val);
-//	}
-//
-//	public void setCustomString(ImageDef item, String propertyName, String val) {
-//		customs.m_imagesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_string.put(propertyName, val);
-//	}
-//
-//	public void setCustomVector(ImageDef item, String propertyName, Vector2 val) {
-//		customs.m_imagesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_vec2.put(propertyName, val);
-//	}
-//
-//	public void setCustomBool(ImageDef item, String propertyName, boolean val) {
-//		customs.m_imagesWithRubeDefDataCustomProperties.add(item);
-//		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_bool.put(propertyName, val);
-//	}
-
-	// hasCustomXXX
+	public void setCustomColor(Object item, String propertyName, Color val) {
+		customs.register(item);
+		getRubeDefDataCustomPropertiesForItem(item, true).m_customPropertyMap_color.put(propertyName, val);
+	}
 
 	public boolean hasCustomInt(Object item, String propertyName) {
 		return getRubeDefDataCustomPropertiesForItem(item, false) != null &&
@@ -426,6 +328,11 @@ public class RubeDef {
 	public boolean hasCustomBool(Object item, String propertyName) {
 		return getRubeDefDataCustomPropertiesForItem(item, false) != null &&
 				getRubeDefDataCustomPropertiesForItem(item, false).m_customPropertyMap_bool.containsKey(propertyName);
+	}
+
+	public boolean hasCustomColor(Object item, String propertyName) {
+		return getRubeDefDataCustomPropertiesForItem(item, false) != null &&
+				getRubeDefDataCustomPropertiesForItem(item, false).m_customPropertyMap_color.containsKey(propertyName);
 	}
 
 	// getCustomXXX
@@ -472,6 +379,15 @@ public class RubeDef {
 			return defaultVal;
 		if (props.m_customPropertyMap_bool.containsKey(propertyName))
 			return (Boolean) props.m_customPropertyMap_bool.get(propertyName);
+		return defaultVal;
+	}
+
+	public Color getCustomColor(Object item, String propertyName, Color defaultVal) {
+		RubeDefDataCustomProperties props = getRubeDefDataCustomPropertiesForItem(item, false);
+		if (null == props)
+			return defaultVal;
+		if (props.m_customPropertyMap_color.containsKey(propertyName))
+			return props.m_customPropertyMap_color.get(propertyName);
 		return defaultVal;
 	}
 
