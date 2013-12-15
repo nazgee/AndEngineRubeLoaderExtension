@@ -207,7 +207,7 @@ public class RubeParser extends ParserDef<RubeDef> {
 			}
 
 			IEntity e = this.getEntityFactory().produce(world, imageDef, imagemaps.get(i));
-			rubeDef.registerEntity(e, i, imagemaps.get(i).getString("name", ""));
+			rubeDef.registerEntity(e, i, imagemaps.get(i).getString("name", ""), imageDef);
 
 			if (imageDef.body != null) {
 				rubeDef.mapEntityToBody(e, imageDef.body);

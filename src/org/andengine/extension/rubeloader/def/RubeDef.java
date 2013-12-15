@@ -27,6 +27,7 @@ public class RubeDef {
 	public RubeDefDataNamesMap names = new RubeDefDataNamesMap();
 	public RubeDefDataCustomizedSet customs = new RubeDefDataCustomizedSet();
 	public Map<Body, LinkedList<IEntity>> mBodyToEntitiesMap = new HashMap<Body, LinkedList<IEntity>>();
+	public Map<IEntity, ImageDef> mEntityToDef = new HashMap<IEntity, ImageDef>();
 
 	// This maps an item (Body, Fixture etc) to a set of custom properties.
 	// Use null for world properties.
@@ -124,10 +125,11 @@ public class RubeDef {
 			indexes.m_jointToIndexMap.put(joint, index);
 		}
 	}
-	public void registerEntity(IEntity image, int index, String pName) {
+	public void registerEntity(IEntity image, int index, String pName, ImageDef imageDef) {
 		if (image != null) {
 			primitives.images.add(index, image);
 			names.m_imageToNameMap.put(image, pName);
+			mEntityToDef.put(image, imageDef);
 		}
 	}
 
