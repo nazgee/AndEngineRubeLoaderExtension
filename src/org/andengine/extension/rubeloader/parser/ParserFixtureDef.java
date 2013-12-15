@@ -22,7 +22,7 @@ public class ParserFixtureDef extends ParserDef<FixtureDef> {
 		FixtureDef fixtureDef = new FixtureDef();
 
 		fixtureDef.restitution = pMap.getFloat("restitution", 0.0f);
-		fixtureDef.friction = pMap.getFloat("friction");
+		fixtureDef.friction = pMap.getFloat("friction", 0);
 		fixtureDef.density = pMap.getFloat("density", 0);
 		fixtureDef.isSensor = pMap.getBool("sensor", false);
 		fixtureDef.filter.categoryBits = (short) pMap.getInt("filter-categoryBits", 0x0001);
