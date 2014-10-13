@@ -4,7 +4,7 @@ import org.andengine.extension.rubeloader.json.AutocastMap;
 
 public class EmptyParserDef extends Parser<AutocastMap> {
 	@Override
-	protected AutocastMap doParse(AutocastMap pMap) {
+	protected AutocastMap doParse(AutocastMap pMap, float tX, float tY) {
 		return pMap;
 	}
 }

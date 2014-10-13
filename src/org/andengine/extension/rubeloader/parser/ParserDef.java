@@ -9,9 +9,9 @@ public abstract class ParserDef<T> extends Parser<T> {
 	private ArrayList<AutocastMap> mInflatedCustomProperties; 
 
 	@Override
-	public T parse(AutocastMap pMap) {
-		T ret = super.parse(pMap);
-		mInflatedCustomProperties = mInflaterOfCustomProperties.parse(pMap);
+	public T parse(AutocastMap pMap, float tX, float tY) {
+		T ret = super.parse(pMap, tX, tY);
+		mInflatedCustomProperties = mInflaterOfCustomProperties.parse(pMap, tX, tY);
 
 		return ret;
 	}

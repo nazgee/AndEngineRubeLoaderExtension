@@ -62,14 +62,20 @@ public class RubeLoader {
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	public RubeDef loadMoreToExistingWorld(final Resources pResources, final IEntity pSceneEntity, final ITextureProvider pTextureProvider, final VertexBufferObjectManager pVBOM, int resId, final IPhysicsWorldProvider pPhysicsWorldProvider) {
+	public RubeDef loadMoreToExistingWorld(final Resources pResources, final IEntity pSceneEntity, final ITextureProvider pTextureProvider,
+			final VertexBufferObjectManager pVBOM, int resId, final IPhysicsWorldProvider pPhysicsWorldProvider) {
+		return loadMoreToExistingWorld(pResources, pSceneEntity, pTextureProvider, pVBOM, resId, pPhysicsWorldProvider, 0, 0);
+	}
+
+	public RubeDef loadMoreToExistingWorld(final Resources pResources, final IEntity pSceneEntity, final ITextureProvider pTextureProvider,
+			final VertexBufferObjectManager pVBOM, int resId, final IPhysicsWorldProvider pPhysicsWorldProvider, float tX, float tY) {
 		long startTime = System.currentTimeMillis();
 
 		this.mEntityFactory.configure(pSceneEntity, pTextureProvider, pVBOM);
 
 		RubeDef rube;
 		try {
-			rube = mRubeParser.continueParse(pPhysicsWorldProvider, readResource(resId, pResources));
+			rube = mRubeParser.continueParse(pPhysicsWorldProvider, readResource(resId, pResources), tX, tY);
 		} catch (ParseException e) {
 			throw new RuntimeException("RUBE json parsing failed! ", e);
 		}
@@ -80,14 +86,20 @@ public class RubeLoader {
 		return rube;
 	}
 
-	public RubeDef load(final Resources pResources, final IEntity pSceneEntity, final ITextureProvider pTextureProvider, final VertexBufferObjectManager pVBOM, int resId) {
+	public RubeDef load(final Resources pResources, final IEntity pSceneEntity, final ITextureProvider pTextureProvider,
+			final VertexBufferObjectManager pVBOM, int resId) {
+		return load(pResources, pSceneEntity, pTextureProvider, pVBOM, resId, 0, 0);
+	}
+
+	public RubeDef load(final Resources pResources, final IEntity pSceneEntity, final ITextureProvider pTextureProvider,
+			final VertexBufferObjectManager pVBOM, int resId, float tX, float tY) {
 		long startTime = System.currentTimeMillis();
 
 		this.mEntityFactory.configure(pSceneEntity, pTextureProvider, pVBOM);
 
 		RubeDef rube;
 		try {
-			rube = mRubeParser.parse(readResource(resId, pResources));
+			rube = mRubeParser.parse(readResource(resId, pResources), tX, tY);
 		} catch (ParseException e) {
 			throw new RuntimeException("RUBE json parsing failed! ", e);
 		}

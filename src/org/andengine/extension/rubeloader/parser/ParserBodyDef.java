@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 public class ParserBodyDef extends ParserDef<BodyDef> {
 
 	@Override
-	protected BodyDef doParse(AutocastMap pMap) {
+	protected BodyDef doParse(AutocastMap pMap, float tX, float tY) {
 		BodyDef bodyDef = new BodyDef();
 		switch (pMap.getInt("type")) {
 		case 0:
@@ -24,6 +24,8 @@ public class ParserBodyDef extends ParserDef<BodyDef> {
 			break;
 		}
 		bodyDef.position.set(pMap.getVector2("position"));
+		bodyDef.position.x += tX;
+		bodyDef.position.y += tY;
 		bodyDef.angle = pMap.getFloat("angle");
 		bodyDef.linearVelocity.set(pMap.getVector2("linearVelocity", new Vector2(0, 0)));
 		bodyDef.angularVelocity = pMap.getFloat("angularVelocity", 0);

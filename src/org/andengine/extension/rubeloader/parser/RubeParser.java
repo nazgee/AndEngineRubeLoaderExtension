@@ -89,13 +89,13 @@ public class RubeParser extends ParserDef<RubeDef> {
 	}
 
 	@Override
-	protected RubeDef doParse(AutocastMap pMap) {
-		return doParse(new RubeDef(), pMap);
+	protected RubeDef doParse(AutocastMap pMap, float tX, float tY) {
+		return doParse(new RubeDef(), pMap, tX, tY);
 	}
 
-	public RubeDef continueParse(IPhysicsWorldProvider pPhysicsWorldProvider, String pStringToParse) throws ParseException {
+	public RubeDef continueParse(IPhysicsWorldProvider pPhysicsWorldProvider, String pStringToParse, float tX, float tY) throws ParseException {
 		AutocastMap map = loadMapFromString(pStringToParse);
-		return doParse(new RubeDef(pPhysicsWorldProvider), map);
+		return doParse(new RubeDef(pPhysicsWorldProvider), map, tX, tY);
 	}
 
 	// ===========================================================
@@ -125,7 +125,7 @@ public class RubeParser extends ParserDef<RubeDef> {
 	// Methods
 	// ===========================================================
 
-	protected RubeDef doParse(RubeDef rubeDef, AutocastMap pMap) {
+	protected RubeDef doParse(RubeDef rubeDef, AutocastMap pMap, float tX, float tY) {
 
 		mParserBodies.setParsingListener(new BasicListener<BodyDef>());
 		mParserFixtures.setParsingListener(new BasicListener<FixtureDef>());
@@ -136,9 +136,9 @@ public class RubeParser extends ParserDef<RubeDef> {
 			rubeDef.worldProvider = new PhysicsWorldProvider(pMap, this.mPhysicsWorldFactory);
 		}
 
-		mParserBodies.parse(pMap);
-		mParserJoints.parse(pMap);
-		mParserImages.parse(pMap);
+		mParserBodies.parse(pMap, tX, tY);
+		mParserJoints.parse(pMap, tX, tY);
+		mParserImages.parse(pMap, tX, tY);
 
 		List<BodyDef> bodydefs = mParserBodies.getInflatedResult();
 		List<AutocastMap> bodymaps = mParserBodies.getInflatedMapsList();
@@ -170,7 +170,7 @@ public class RubeParser extends ParserDef<RubeDef> {
 			installCustomProps(rubeDef, b, bodycustoms.get(i));
 
 			/* fixtures */
-			mParserFixtures.parse(bodymaps.get(i));
+			mParserFixtures.parse(bodymaps.get(i), tX, tY);
 			List<FixtureDef> fixturedefs = mParserFixtures.getInflatedResult();
 			List<AutocastMap> fixturemaps = mParserFixtures.getInflatedMapsList();
 			List<ArrayList<AutocastMap>> fixturecustoms = mParserFixtures.getInflatedCustomPropertiesList();

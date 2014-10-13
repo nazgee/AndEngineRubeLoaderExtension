@@ -7,7 +7,7 @@ import org.andengine.extension.rubeloader.json.AutocastMap;
 public class ParserWorldDef extends ParserDef<WorldDef> {
 
 	@Override
-	protected WorldDef doParse(AutocastMap pMap) {
+	protected WorldDef doParse(AutocastMap pMap, float tX, float tY) {
 		WorldDef world = new WorldDef();
 
 		world.positionIterations = pMap.getInt("positionIterations");
