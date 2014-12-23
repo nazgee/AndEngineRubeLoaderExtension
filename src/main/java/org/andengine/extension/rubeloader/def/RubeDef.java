@@ -95,40 +95,40 @@ public class RubeDef {
 	}
 
 	public static class RubeDefDataNamesMap {
-		public Map<Body, String> m_bodyToNameMap = new HashMap<Body, String>();
-		public Map<Fixture, String> m_fixtureToNameMap = new HashMap<Fixture, String>();
-		public Map<Joint, String> m_jointToNameMap = new HashMap<Joint, String>();
-		public Map<IEntity, String> m_imageToNameMap = new HashMap<IEntity, String>();
+		public Map<Body, String> bodyToNameMap = new HashMap<Body, String>();
+		public Map<Fixture, String> fixtureToNameMap = new HashMap<Fixture, String>();
+		public Map<Joint, String> jointToNameMap = new HashMap<Joint, String>();
+		public Map<IEntity, String> imageToNameMap = new HashMap<IEntity, String>();
 	}
 	public static class RubeDefDataIndexesMap {
-		public Map<Integer, Body> m_indexToBodyMap = new HashMap<Integer, Body>();
-		public Map<Body, Integer> m_bodyToIndexMap = new HashMap<Body, Integer>();
-		public Map<Joint, Integer> m_jointToIndexMap = new HashMap<Joint, Integer>();
+		public Map<Integer, Body> indexToBodyMap = new HashMap<Integer, Body>();
+		public Map<Body, Integer> bodyToIndexMap = new HashMap<Body, Integer>();
+		public Map<Joint, Integer> jointToIndexMap = new HashMap<Joint, Integer>();
 	}
 	public void registerBody(Body body, int index, String pName) {
 		if (body != null) {
 			primitives.bodies.add(index, body);
-			names.m_bodyToNameMap.put(body, pName);
-			indexes.m_bodyToIndexMap.put(body, index);
-			indexes.m_indexToBodyMap.put(index, body);
+			names.bodyToNameMap.put(body, pName);
+			indexes.bodyToIndexMap.put(body, index);
+			indexes.indexToBodyMap.put(index, body);
 		}
 	}
 	public void registerFixture(Fixture fixture, String pName) {
 		if (fixture != null) {
-			names.m_fixtureToNameMap.put(fixture, pName);
+			names.fixtureToNameMap.put(fixture, pName);
 		}
 	}
 	public void registerJoint(Joint joint, int index, String pName) {
 		if (joint != null) {
 			primitives.joints.add(index, joint);
-			names.m_jointToNameMap.put(joint, pName);
-			indexes.m_jointToIndexMap.put(joint, index);
+			names.jointToNameMap.put(joint, pName);
+			indexes.jointToIndexMap.put(joint, index);
 		}
 	}
 	public void registerEntity(IEntity image, int index, String pName, ImageDef imageDef) {
 		if (image != null) {
 			primitives.images.add(index, image);
-			names.m_imageToNameMap.put(image, pName);
+			names.imageToNameMap.put(image, pName);
 			mEntityToDef.put(image, imageDef);
 		}
 	}
@@ -183,7 +183,7 @@ public class RubeDef {
 
 	public Body[] getBodiesByName(String name) {
 		Set<Body> keys = new HashSet<Body>();
-		for (Entry<Body, String> entry : names.m_bodyToNameMap.entrySet()) {
+		for (Entry<Body, String> entry : names.bodyToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				keys.add(entry.getKey());
 			}
@@ -193,7 +193,7 @@ public class RubeDef {
 
 	public Fixture[] getFixturesByName(String name) {
 		Set<Fixture> keys = new HashSet<Fixture>();
-		for (Entry<Fixture, String> entry : names.m_fixtureToNameMap.entrySet()) {
+		for (Entry<Fixture, String> entry : names.fixtureToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				keys.add(entry.getKey());
 			}
@@ -203,7 +203,7 @@ public class RubeDef {
 
 	public Joint[] getJointsByName(String name) {
 		Set<Joint> keys = new HashSet<Joint>();
-		for (Entry<Joint, String> entry : names.m_jointToNameMap.entrySet()) {
+		for (Entry<Joint, String> entry : names.jointToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				keys.add(entry.getKey());
 			}
@@ -213,7 +213,7 @@ public class RubeDef {
 
 	public IEntity[] getImagesByName(String name) {
 		Set<IEntity> keys = new HashSet<IEntity>();
-		for (Entry<IEntity, String> entry : names.m_imageToNameMap.entrySet()) {
+		for (Entry<IEntity, String> entry : names.imageToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				keys.add(entry.getKey());
 			}
@@ -226,7 +226,7 @@ public class RubeDef {
 	}
 
 	public Body getBodyByName(String name) {
-		for (Entry<Body, String> entry : names.m_bodyToNameMap.entrySet()) {
+		for (Entry<Body, String> entry : names.bodyToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				return entry.getKey();
 			}
@@ -235,7 +235,7 @@ public class RubeDef {
 	}
 
 	public Fixture getFixtureByName(String name) {
-		for (Entry<Fixture, String> entry : names.m_fixtureToNameMap.entrySet()) {
+		for (Entry<Fixture, String> entry : names.fixtureToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				return entry.getKey();
 			}
@@ -244,7 +244,7 @@ public class RubeDef {
 	}
 
 	public Joint getJointByName(String name) {
-		for (Entry<Joint, String> entry : names.m_jointToNameMap.entrySet()) {
+		for (Entry<Joint, String> entry : names.jointToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				return entry.getKey();
 			}
@@ -253,7 +253,7 @@ public class RubeDef {
 	}
 
 	public IEntity getImageByName(String name) {
-		for (Entry<IEntity, String> entry : names.m_imageToNameMap.entrySet()) {
+		for (Entry<IEntity, String> entry : names.imageToNameMap.entrySet()) {
 			if (name.equals(entry.getValue())) {
 				return entry.getKey();
 			}
@@ -506,11 +506,31 @@ public class RubeDef {
 		return items.size();
 	}
 
+	public int getFixturesWithCustomInt(String propertyName, Vector<Fixture> items) {
+		Iterator<Fixture> iterator = customs.m_fixturesWithRubeDefDataCustomProperties.iterator();
+		while (iterator.hasNext()) {
+			Fixture item = iterator.next();
+			if (hasCustomInt(item, propertyName))
+				items.add(item);
+		}
+		return items.size();
+	}
+
 	public int getFixturesByCustomFloat(String propertyName, float valueToMatch, Vector<Fixture> items) {
 		Iterator<Fixture> iterator = customs.m_fixturesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
 			Fixture item = iterator.next();
 			if (hasCustomFloat(item, propertyName) && getCustomFloat( item, propertyName, 0 ) == valueToMatch)
+				items.add(item);
+		}
+		return items.size();
+	}
+
+	public int getFixturesWithCustomFloat(String propertyName, Vector<Fixture> items) {
+		Iterator<Fixture> iterator = customs.m_fixturesWithRubeDefDataCustomProperties.iterator();
+		while (iterator.hasNext()) {
+			Fixture item = iterator.next();
+			if (hasCustomFloat(item, propertyName))
 				items.add(item);
 		}
 		return items.size();
@@ -526,11 +546,11 @@ public class RubeDef {
 		return items.size();
 	}
 
-	public int getFixturesByCustomString(String propertyName, Vector<Fixture> items) {
+	public int getFixturesWithCustomString(String propertyName, Vector<Fixture> items) {
 		Iterator<Fixture> iterator = customs.m_fixturesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
 			Fixture item = iterator.next();
-			if (hasCustomString(item, propertyName) && getCustomString( item, propertyName, new String() ).length() > 0)
+			if (hasCustomString(item, propertyName))
 				items.add(item);
 		}
 		return items.size();
@@ -546,6 +566,16 @@ public class RubeDef {
 		return items.size();
 	}
 
+	public int getFixturesWithCustomVector(String propertyName, Vector<Fixture> items) {
+		Iterator<Fixture> iterator = customs.m_fixturesWithRubeDefDataCustomProperties.iterator();
+		while (iterator.hasNext()) {
+			Fixture item = iterator.next();
+			if (hasCustomVector(item, propertyName))
+				items.add(item);
+		}
+		return items.size();
+	}
+
 	public int getFixturesByCustomBool(String propertyName, boolean valueToMatch, Vector<Fixture> items) {
 		Iterator<Fixture> iterator = customs.m_fixturesWithRubeDefDataCustomProperties.iterator();
 		while (iterator.hasNext()) {
@@ -556,6 +586,15 @@ public class RubeDef {
 		return items.size();
 	}
 
+	public int getFixturesWithCustomBool(String propertyName, Vector<Fixture> items) {
+		Iterator<Fixture> iterator = customs.m_fixturesWithRubeDefDataCustomProperties.iterator();
+		while (iterator.hasNext()) {
+			Fixture item = iterator.next();
+			if (hasCustomBool(item, propertyName))
+				items.add(item);
+		}
+		return items.size();
+	}
 	// get by custom property value (single version, Fixture)
 	Fixture getFixtureByCustomInt(String propertyName, int valueToMatch) {
 		Iterator<Fixture> iterator = customs.m_fixturesWithRubeDefDataCustomProperties.iterator();
